@@ -1,0 +1,30 @@
+#!/bin/bash
+set -euo pipefail
+root=$(cd -- "$(dirname -- "$0")/.." && pwd)
+if [[ "${1:-}" == "--with-omni" ]]; then
+  shift
+  source "$root/config/omni-local.sh"
+fi
+if [[ "${1:-}" == "--with-specialists" ]]; then
+  shift
+  toolkit=$(cd -- "$root/../.." && pwd -P)
+  [[ -x "$toolkit/.runtime/mcp/bin/python" ]] || { echo "Run bin/install core first." >&2; exit 1; }
+  exec "$toolkit/.runtime/mcp/bin/python" "$toolkit/src/specialists_bridge.py" "$root/bin/claude-local" "$@"
+fi
+local_config="$root/.state/claude-local"
+mkdir -p "$local_config"
+claude_bin=$(command -v claude || true)
+if [[ -z "$claude_bin" ]]; then
+  claude_bin="$HOME/.local/bin/claude"
+fi
+[[ -x "$claude_bin" ]] || { echo "Claude Code CLI was not found." >&2; exit 1; }
+exec /usr/bin/sandbox-exec -f "$root/config/loopback-only.sb" \
+  -D "SPECIALISTS_SOCKET=${LFM_SPECIALISTS_SOCKET:-/dev/null}" -D "OMNI_SOCKET=${LFM_OMNI_ALLOWED_SOCKET:-/dev/null}" /usr/bin/env \
+  -u ANTHROPIC_AUTH_TOKEN -u ANTHROPIC_CUSTOM_HEADERS \
+  -u CLAUDE_CODE_USE_BEDROCK -u CLAUDE_CODE_USE_VERTEX -u CLAUDE_CODE_USE_FOUNDRY \
+  -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u http_proxy -u https_proxy -u all_proxy \
+  CLAUDE_CONFIG_DIR="$local_config" ANTHROPIC_BASE_URL="http://127.0.0.1:8080" \
+  ANTHROPIC_API_KEY=local-lfm CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 DISABLE_AUTOUPDATER=1 \
+  CLAUDE_CODE_DISABLE_OFFICIAL_MARKETPLACE_AUTOINSTALL=1 \
+  "$claude_bin" --bare --setting-sources '' --settings "$root/config/claude-local.json" \
+  --strict-mcp-config --mcp-config '{"mcpServers":{}}' --model lfm-reason "$@"

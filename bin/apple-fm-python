@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+root="$(cd "$(dirname "$0")/.." && pwd -P)"
+sdk="$root/.runtime/apple-fm-sdk"
+if [[ ! -x "$sdk/bin/python" || ! -f "$sdk/current/.verified" ]]; then
+  echo 'Run bin/install apple-fm-python first.' >&2
+  exit 1
+fi
+export PYTHONPATH="$sdk/current${PYTHONPATH:+:$PYTHONPATH}"
+exec "$sdk/bin/python" "$@"

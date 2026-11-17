@@ -1,0 +1,15 @@
+# Versions installed and tested with Python 3.12.13 on macOS 26.5 (Apple Silicon), CPU and MPS.
+# ffmpeg is also required as a system command (for example `brew install ffmpeg`).
+torch==2.14.1
+torchvision==0.29.1
+numpy==2.5.3
+scipy==1.18.1
+scikit-learn==1.9.1
+pandas==3.0.6
+tqdm==4.70.1
+scenedetect==0.7.1
+opencv-python==5.0.0.93
+python_speech_features==0.6
+gdown==6.4.1
+# Only needed for --evalCol (downloads the Columbia ASD video). Not tested in this fork.
+# youtube-dl

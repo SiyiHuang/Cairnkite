@@ -1,0 +1,12 @@
+#!/bin/bash
+set -euo pipefail
+umask 077
+root="$(cd "$(dirname "$0")/.." && pwd -P)"
+python="$root/.runtime/qwen/bin/python"
+model="$root/.runtime/models/qwen-asr"
+if [[ ! -x "$python" || ! -f "$model/.verified" ]]; then
+  echo 'Run bin/install qwen first.' >&2
+  exit 1
+fi
+export HF_HUB_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1 HF_HUB_DISABLE_IMPLICIT_TOKEN=1
+exec "$python" "$root/src/qwen_stream.py" "$model" "$@"

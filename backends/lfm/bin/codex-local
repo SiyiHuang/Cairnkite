@@ -1,0 +1,32 @@
+#!/bin/bash
+set -euo pipefail
+root=$(cd -- "$(dirname -- "$0")/.." && pwd -P)
+if [[ "${1:-}" == "--with-omni" ]]; then
+  shift
+  source "$root/config/omni-local.sh"
+fi
+if [[ "${1:-}" == "--with-specialists" ]]; then
+  shift
+  toolkit=$(cd -- "$root/../.." && pwd -P)
+  [[ -x "$toolkit/.runtime/mcp/bin/python" ]] || { echo "Run bin/install core first." >&2; exit 1; }
+  exec "$toolkit/.runtime/mcp/bin/python" "$toolkit/src/codex_specialists.py" "$root/bin/codex-local" "$@"
+fi
+local_config="$root/.state/codex-local"
+mkdir -p "$local_config/tmp"
+if ! cmp -s "$root/config/codex-local.toml" "$local_config/config.toml"; then
+  cp "$root/config/codex-local.toml" "$local_config/config.toml"
+fi
+codex_bin=$(command -v codex || true)
+if [[ -z "$codex_bin" ]]; then
+  codex_bin=/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex
+fi
+[[ -x "$codex_bin" ]] || { echo "Codex CLI was not found." >&2; exit 1; }
+port="${LFM_CODEX_SPECIALISTS_PORT:-8080}"
+[[ "$port" =~ ^[0-9]{1,5}$ ]] && (( 10#$port >= 1 && 10#$port <= 65535 )) || { echo "Invalid local adapter port." >&2; exit 1; }
+exec /usr/bin/sandbox-exec -D "LFM_STATE=$local_config" -D "LFM_CODEX_PROVIDER=localhost:$port" \
+  -D "SPECIALISTS_SOCKET=${LFM_SPECIALISTS_SOCKET:-/dev/null}" \
+  -D "OMNI_SOCKET=${LFM_OMNI_ALLOWED_SOCKET:-/dev/null}" \
+  -f "$root/config/codex-local.sb" /usr/bin/env \
+  -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u http_proxy -u https_proxy -u all_proxy \
+  CODEX_HOME="$local_config" TMPDIR="$local_config/tmp" "$codex_bin" --no-daemon \
+  -c "model_instructions_file='$root/config/codex-instructions.md'" "$@"

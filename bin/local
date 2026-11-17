@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+umask 077
+root="$(cd "$(dirname "$0")/.." && pwd -P)"
+python="$root/.runtime/mcp/bin/python"
+if [[ ! -x "$python" ]]; then
+  echo "Run bin/install core first." >&2
+  exit 1
+fi
+exec "$python" "$root/src/local_cli.py" "$@"

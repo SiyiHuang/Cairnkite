@@ -1,0 +1,110 @@
+#!/bin/bash
+set -euo pipefail
+root="$(cd "$(dirname "$0")/.." && pwd -P)"
+launcher="$root/bin/serve"
+lfm_launcher="$root/bin/lfm"
+mcp_python="$root/.runtime/mcp/bin/python"
+lfm_python="$root/backends/lfm/.venv/bin/python"
+check_only=false
+
+if [[ "${1:-}" == --check ]]; then check_only=true; shift; fi
+if [[ "$#" -gt 1 ]]; then
+  echo 'Usage: bin/register [--check] [both|codex|claude]' >&2
+  exit 2
+fi
+case "${1:-both}" in
+  both) clients=(codex claude) ;;
+  codex|claude) clients=("$1") ;;
+  *) echo 'Usage: bin/register [--check] [both|codex|claude]' >&2; exit 2 ;;
+esac
+
+if [[ ! -x "$mcp_python" && ! -x "$lfm_python" ]]; then
+  echo 'Install a backend first with bin/install default.' >&2
+  exit 1
+fi
+python="$lfm_python"
+names=()
+if [[ -x "$mcp_python" ]]; then python="$mcp_python"; names+=(local_specialists); fi
+if [[ -x "$lfm_python" ]]; then names+=(local-lfm); fi
+cd "$root"
+
+inspect_registration() {
+  local client="$1" name="$2" command="$3" info
+  shift 3
+  if [[ "$client" == codex ]]; then
+    if info=$(codex mcp get "$name" --json 2>&1); then
+      "$python" -c '
+import json, sys
+entry = json.load(sys.stdin)
+transport = entry["transport"]
+enabled = entry.get("enabled", True)
+sys.exit(0 if enabled and transport["type"] == "stdio" and
+         transport["command"] == sys.argv[1] and (transport.get("args") or []) == sys.argv[2:] else 2)
+' "$command" "$@" <<< "$info" && return 0
+    elif [[ "$info" == *"No MCP server named '$name' found."* ]]; then
+      return 1
+    else
+      echo "Could not inspect Codex MCP server $name. Run codex mcp get $name --json." >&2
+      return 2
+    fi
+  elif info=$(claude mcp get "$name" 2>&1); then
+    if /usr/bin/grep -Fxq "  Type: stdio" <<< "$info" &&
+       /usr/bin/grep -Fxq "  Command: $command" <<< "$info" &&
+       /usr/bin/grep -Fxq "  Args:${*:+ $*}" <<< "$info"; then
+      return 0
+    fi
+  elif [[ "$info" == *"No MCP server found with name: \"$name\"."* ]]; then
+    return 1
+  else
+    echo "Could not inspect Claude Code MCP server $name. Run claude mcp get $name." >&2
+    return 2
+  fi
+  echo "$client MCP server $name is disabled or points elsewhere. Expected: $command${*:+ $*}" >&2
+  echo "Inspect the existing entry with $client mcp get $name and reconcile it before rerunning bin/register." >&2
+  return 2
+}
+
+launch_arguments() {
+  if [[ "$1" == local-lfm ]]; then
+    launch=("$lfm_launcher" serve)
+  else
+    launch=("$launcher")
+  fi
+}
+
+missing=()
+failed=false
+for client in "${clients[@]}"; do
+  for name in "${names[@]}"; do
+    launch_arguments "$name"
+    if inspect_registration "$client" "$name" "${launch[@]}"; then
+      printf '%s %s configured at %s\n' "$client" "$name" "${launch[*]}"
+    elif [[ "$?" == 1 ]]; then
+      if "$check_only"; then
+        echo "$client MCP server $name is missing. Run bin/register $client." >&2
+        failed=true
+      else
+        missing+=("$client:$name")
+      fi
+    else
+      failed=true
+    fi
+  done
+done
+if "$failed"; then exit 1; fi
+if "$check_only"; then exit 0; fi
+
+for target in ${missing[@]+"${missing[@]}"}; do
+  client="${target%%:*}"
+  name="${target#*:}"
+  launch_arguments "$name"
+  if [[ "$client" == codex ]]; then
+    codex mcp add "$name" -- "${launch[@]}"
+  else
+    claude mcp add --transport stdio --scope user "$name" -- "${launch[@]}"
+  fi
+  inspect_registration "$client" "$name" "${launch[@]}"
+done
+if [[ -x "$mcp_python" && "${clients[0]}" == codex ]]; then
+  "$mcp_python" "$root/scripts/codex_timeout.py" "$launcher"
+fi

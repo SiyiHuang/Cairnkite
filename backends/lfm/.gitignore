@@ -1,0 +1,9 @@
+.venv/
+.runtime/
+.state/
+logs/
+models/
+inbox/*
+!inbox/.gitkeep
+__pycache__/
+*.pyc

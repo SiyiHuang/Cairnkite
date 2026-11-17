@@ -1,0 +1,2 @@
+# mlx-lm is pinned to source for hunyuan_v1_dense support.
+mlx-lm @ git+https://github.com/ml-explore/mlx-lm.git@56230fa02b8ff8330daf26dc95c28480423ed5fe

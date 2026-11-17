@@ -1,0 +1,27 @@
+model = "lfm-reason"
+model_provider = "local-lfm"
+model_context_window = 32768
+model_auto_compact_token_limit = 24000
+approval_policy = "on-request"
+# The enclosing macOS profile enforces read-only workspace and loopback-only network.
+sandbox_mode = "danger-full-access"
+web_search = "disabled"
+check_for_update_on_startup = false
+project_doc_max_bytes = 0
+
+[features]
+plugins = false
+skill_search = false
+shell_snapshot = false
+
+[model_providers.local-lfm]
+name = "Local LFM"
+base_url = "http://127.0.0.1:8080/v1"
+wire_api = "responses"
+requires_openai_auth = false
+
+[analytics]
+enabled = false
+
+[feedback]
+enabled = false

@@ -1,0 +1,2519 @@
+{
+  "default_backends": [
+    "pdfkit",
+    "vision",
+    "barcodes",
+    "apple-speech",
+    "apple-tts",
+    "apple-foreground",
+    "spotlight",
+    "apple-translation",
+    "natural-language",
+    "lfm-fast",
+    "lfm-vision"
+  ],
+  "tasks": [
+    {
+      "id": "documents",
+      "label": "文档与截图 / Documents",
+      "choices": [
+        {
+          "id": "pdf-text",
+          "label": "PDF 有文字层",
+          "prompt": "只读出原文和页码？",
+          "candidates": [
+            "pdfkit",
+            "vision",
+            "paddle"
+          ]
+        },
+        {
+          "id": "scan",
+          "label": "扫描页文字和表格",
+          "prompt": "快速识别文字、边界框或简单表格？",
+          "candidates": [
+            "vision",
+            "paddle",
+            "minicpm"
+          ]
+        },
+        {
+          "id": "complex-layout",
+          "label": "版面、复杂表格或公式",
+          "prompt": "需要区块、Markdown 与阅读顺序线索？",
+          "candidates": [
+            "paddle",
+            "minicpm",
+            "vision"
+          ]
+        },
+        {
+          "id": "ocr-review",
+          "label": "OCR 局部复核",
+          "prompt": "已有识别结果，想给原始区域和候选的一致性打分？",
+          "candidates": [
+            "jev"
+          ]
+        },
+        {
+          "id": "ocr-second-pass",
+          "label": "第二套 OCR 输出",
+          "prompt": "想对同一页用独立模型重新生成文字？",
+          "candidates": [
+            "minicpm",
+            "paddle"
+          ]
+        },
+        {
+          "id": "barcodes",
+          "label": "条码与二维码",
+          "prompt": "需要原始编码值和位置？",
+          "candidates": [
+            "barcodes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "audio",
+      "label": "录音、字幕与声音 / Audio",
+      "choices": [
+        {
+          "id": "transcript",
+          "label": "常规录音转写",
+          "prompt": "只需要带时间的文字？",
+          "candidates": [
+            "apple-speech",
+            "moss",
+            "qwen-asr",
+            "qwen-large"
+          ]
+        },
+        {
+          "id": "speaker-transcript",
+          "label": "多人发言与时间",
+          "prompt": "需要从音频区分匿名说话人？",
+          "candidates": [
+            "moss"
+          ]
+        },
+        {
+          "id": "word-timestamps",
+          "label": "带词级时间的转写",
+          "prompt": "尚未有文本，输出需要细粒度对齐？",
+          "candidates": [
+            "qwen-asr",
+            "qwen-large"
+          ]
+        },
+        {
+          "id": "align-transcript",
+          "label": "对齐已有或校订过的字幕",
+          "prompt": "已有原音和校订文本？",
+          "candidates": [
+            "qwen-align"
+          ]
+        },
+        {
+          "id": "speech-activity",
+          "label": "人声活动区间",
+          "prompt": "只想定位有声与静音？",
+          "candidates": [
+            "silero-vad",
+            "sound-analysis",
+            "apple-speech"
+          ]
+        },
+        {
+          "id": "speech-detector-probe",
+          "label": "Apple SpeechDetector 接口诊断",
+          "prompt": "需要检查本机 SpeechDetector 接口是否返回错误？",
+          "candidates": ["speech-detector"]
+        },
+        {
+          "id": "streaming",
+          "label": "实时 PCM 流转写",
+          "prompt": "需要从持续音频流读取结果？",
+          "candidates": [
+            "qwen-stream"
+          ]
+        },
+        {
+          "id": "stream-replay",
+          "label": "回放流式转写",
+          "prompt": "已有录音，想检查每一轮的暂定文字和回滚？",
+          "candidates": ["qwen-stream-replay"]
+        },
+        {
+          "id": "separate-audio",
+          "label": "提示词分离音轨",
+          "prompt": "想得到目标声音和剩余声音两个 WAV？",
+          "candidates": [
+            "sam-audio"
+          ]
+        },
+        {
+          "id": "tts",
+          "label": "文本合成朗读",
+          "prompt": "想生成可试听的中英本机音频？",
+          "candidates": [
+            "apple-tts",
+            "kokoro"
+          ]
+        },
+        {
+          "id": "sound-events",
+          "label": "声音事件分类",
+          "prompt": "需要掌声、笑声等环境声音时间位置？",
+          "candidates": [
+            "sound-analysis"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "search",
+      "label": "检索与定位 / Search",
+      "choices": [
+        {
+          "id": "file-search",
+          "label": "文件名或编号",
+          "prompt": "已知文件名，需要先定位路径？",
+          "candidates": [
+            "spotlight",
+            "digup"
+          ]
+        },
+        {
+          "id": "semantic-search",
+          "label": "本机图文音视频语义搜索",
+          "prompt": "只知道含义，想找到候选文件或时间位置？",
+          "candidates": [
+            "omni",
+            "digup"
+          ]
+        },
+        {
+          "id": "cross-mac-search",
+          "label": "经配对的跨 Mac 搜索",
+          "prompt": "需要查询多台拥有访问权限的 Mac？",
+          "candidates": [
+            "omni-pairing"
+          ]
+        },
+        {
+          "id": "cross-mac-copy",
+          "label": "取回已配对 Mac 的原件",
+          "prompt": "需要把一个 Omni 搜索命中复制到获准的本机目录？",
+          "candidates": ["omni-linked-copy"]
+        },
+        {
+          "id": "app-search",
+          "label": "自有 App 索引",
+          "prompt": "需要搜索已经向系统登记的 App 内容？",
+          "candidates": [
+            "core-spotlight",
+            "core-spotlight-semantic"
+          ]
+        },
+        {
+          "id": "code-search",
+          "label": "按代码行为搜索",
+          "prompt": "知道作用但不知道函数名？",
+          "candidates": [
+            "jina-grep",
+            "digup"
+          ]
+        },
+        {
+          "id": "visual-rerank",
+          "label": "候选图片或页面精排",
+          "prompt": "已经有召回候选，想用问题逐项评分？",
+          "candidates": [
+            "qwen-reranker",
+            "qwen-reranker-4bit"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "text",
+      "label": "文本处理 / Text",
+      "choices": [
+        {
+          "id": "translate",
+          "label": "一般文段或批量翻译",
+          "prompt": "翻译由系统语言对覆盖？",
+          "candidates": [
+            "apple-translation",
+            "hy-mt"
+          ]
+        },
+        {
+          "id": "glossary-translation",
+          "label": "固定术语的长文或字幕翻译",
+          "prompt": "必须提供术语表或指定上下文？",
+          "candidates": [
+            "hy-mt"
+          ]
+        },
+        {
+          "id": "language-tags",
+          "label": "语种、词性或实体",
+          "prompt": "需要基础语言标签和原文位置？",
+          "candidates": [
+            "natural-language",
+            "gliner"
+          ]
+        },
+        {
+          "id": "extract-fields",
+          "label": "按自定义 schema 抽字段",
+          "prompt": "给定字段、类型或关系后批量取值？",
+          "candidates": [
+            "lfm-fast",
+            "foundation-structured",
+            "gliner"
+          ]
+        },
+        {
+          "id": "summarize",
+          "label": "短文本问答或摘要",
+          "prompt": "需要设备上的短文本生成？",
+          "candidates": [
+            "lfm-fast",
+            "foundation-models"
+          ]
+        },
+        {
+          "id": "focused-review",
+          "label": "复核材料或代码",
+          "prompt": "已有原文和明确的复核问题？",
+          "candidates": ["lfm-reason", "lfm-reason-q4"]
+        },
+        {
+          "id": "local-tool-calls",
+          "label": "本地生成工具调用",
+          "prompt": "要给已定义的函数选择名称和参数？",
+          "candidates": ["lfm-tools", "apple-fm-python"]
+        },
+        {
+          "id": "apple-record-lookup",
+          "label": "Apple 设备模型查结构化记录",
+          "prompt": "需要 Apple Intelligence 调用 Python 回调查指定 JSON 记录？",
+          "candidates": ["apple-fm-python"]
+        },
+        {
+          "id": "compact-text",
+          "label": "较小权重的文本生成",
+          "prompt": "优先省存储并有固定样本可以对照？",
+          "candidates": ["lfm-fast-q4", "lfm-fast"]
+        },
+        {
+          "id": "redact",
+          "label": "敏感字段检测和替换",
+          "prompt": "需在本机给文本标出或替换隐私字段？",
+          "candidates": [
+            "privacy-filter"
+          ]
+        },
+        {
+          "id": "triage",
+          "label": "多选项评分和分流",
+          "prompt": "需要对固定选项打分或按规则分流？",
+          "candidates": [
+            "clef"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "media",
+      "label": "视频与视觉 / Video and Vision",
+      "choices": [
+        {
+          "id": "visual-question",
+          "label": "静态图像或截图问答",
+          "prompt": "需要回答有关图像内容的问题？",
+          "candidates": ["lfm-vision", "apple-fm-image"]
+        },
+        {
+          "id": "active-video-speaker",
+          "label": "画面中谁在讲话",
+          "prompt": "已经有普通相机视角和同步音轨？",
+          "candidates": [
+            "talknet"
+          ]
+        },
+        {
+          "id": "object-tracking",
+          "label": "分割和跨帧对象跟踪",
+          "prompt": "需要掩膜和目标轨迹？",
+          "candidates": [
+            "sam3"
+          ]
+        },
+        {
+          "id": "restore-video",
+          "label": "视频修复",
+          "prompt": "优先原分辨率修复，还是需要放大？",
+          "candidates": [
+            "swiftvr",
+            "seedvr2"
+          ]
+        },
+        {
+          "id": "upscale-image",
+          "label": "放大单张图片",
+          "prompt": "需要在本机重建更高分辨率的静图？",
+          "candidates": ["seedvr2"]
+        },
+        {
+          "id": "upscale-video",
+          "label": "放大短视频",
+          "prompt": "需要放大短视频？先确认输入尺寸和机器能力。",
+          "candidates": ["seedvr2", "apple-video-upscale"]
+        },
+        {
+          "id": "upscale-video-4x",
+          "label": "4 倍放大短视频",
+          "prompt": "输入尺寸在这台设备上支持 4 倍放大？",
+          "candidates": ["apple-video-upscale"]
+        },
+        {
+          "id": "foreground-mask",
+          "label": "静态图片抠图",
+          "prompt": "要保留画面前景并输出透明 PNG？",
+          "candidates": ["apple-foreground", "sam3"]
+        },
+        {
+          "id": "vision-media",
+          "label": "图片相似性与外观",
+          "prompt": "系统 Vision 能直接给预计输出？",
+          "candidates": [
+            "vision-media"
+          ]
+        },
+        {
+          "id": "relative-depth",
+          "label": "单目相对深度",
+          "prompt": "只需要前后关系与稠密图？",
+          "candidates": [
+            "depth-anything"
+          ]
+        },
+        {
+          "id": "run-core-ml",
+          "label": "部署第三方 Core ML 模型",
+          "prompt": "有 Core ML 模型或可转换权重？",
+          "candidates": [
+            "core-ml"
+          ]
+        },
+        {
+          "id": "shortcut-automation",
+          "label": "调用 macOS 快捷指令",
+          "prompt": "已有想交给代理运行的本机快捷指令？",
+          "candidates": [
+            "shortcuts"
+          ]
+        },
+        {
+          "id": "screenshot-ingest",
+          "label": "新截图自动识别",
+          "prompt": "要在指定目录收到新截图时自动读出文字？",
+          "candidates": ["screenshot-folder", "shortcuts-folder", "shortcuts-screenshot"]
+        }
+      ]
+    },
+    {
+      "id": "special",
+      "label": "工程、证明与机械臂 / Specialist Workflows",
+      "choices": [
+        {
+          "id": "forecast",
+          "label": "多变量时间序列预测",
+          "prompt": "需要数值区间而且有按时间排列的数据？",
+          "candidates": [
+            "timesfm",
+            "chronos"
+          ]
+        },
+        {
+          "id": "lean-check",
+          "label": "检查已有 Lean 证明",
+          "prompt": "已有 Lean 代码和可核对的命题类型？",
+          "candidates": ["lean-kernel"]
+        },
+        {
+          "id": "lean-proof",
+          "label": "Lean 内核可验证的证明",
+          "prompt": "已有形式化命题和固定 mathlib？",
+          "candidates": [
+            "goedel"
+          ]
+        },
+        {
+          "id": "robot-preflight",
+          "label": "机械臂现场运行前检查",
+          "prompt": "需要检查 SO-100 或 SO-101 的串口、校准和本机模型文件？",
+          "candidates": ["smolvla-preflight"]
+        },
+        {
+          "id": "robot-control",
+          "label": "机械臂状态到动作",
+          "prompt": "需要离线回放还是已准备真实硬件？",
+          "candidates": [
+            "smolvla",
+            "smolvla-rollout"
+          ]
+        }
+      ]
+    }
+  ],
+  "requirements": {
+    "boxes": "需返回原页的区域坐标",
+    "table_structure": "需提供表格或单元格结构",
+    "formula_markup": "需公式标记候选",
+    "candidate_score": "需独立一致性分数",
+    "segment_timestamps": "需段级时间区间",
+    "word_timestamps": "需词或语言单元级的时间",
+    "speaker_labels": "需匿名说话人标签",
+    "corrected_transcript": "可输入人工校订文本",
+    "multimodal": "查图文、音频或视频的本机索引",
+    "search_timecodes": "检索结果需带媒体时间码",
+    "exact_keywords": "需用精确关键词",
+    "code_semantic": "需按代码语义查找",
+    "unindexed_code": "需直接给少量候选文件评分",
+    "visual_reranking": "需图文精排",
+    "compact_visual_reranker": "需小于 2 GB 的图文精排权重",
+    "multi_mac": "需联查已配对的 Mac",
+    "linked_file_copy": "需取得已配对 Mac 的文件原件",
+    "local_cli": "需可离开云端会话执行",
+    "glossary": "需自定义术语约束",
+    "schema": "需固定结构或字段",
+    "token_spans": "需原文位置",
+    "realtime": "需流式语音输入",
+    "microphone_input": "需直接用本机麦克风",
+    "vad_intervals": "需只用语音活动检测定位有声区间",
+    "upscale_video": "需视频放大",
+    "native_video_upscale": "用 Apple VideoToolbox 放大视频",
+    "upscale_image": "需放大静态图像",
+    "core_ml": "需 Apple Core ML 路径",
+    "batch_translation": "需逐条批量翻译",
+    "quantiles": "需输出预测分位点",
+    "asr_1_7b": "需用 Qwen3-ASR 1.7B",
+    "app_semantic_index": "需应用自建语义索引",
+    "app_index_tool": "需让设备模型调用 Apple 自有 App 索引",
+    "choice_scores": "需候选选项的分数",
+    "depth_map": "需图像深度图",
+    "forecasts": "需时序预测",
+    "generated_audio": "需生成语音",
+    "lean_checked": "需用 Lean 检验证明",
+    "masks": "需对象掩膜",
+    "redaction": "需标记或替换敏感信息",
+    "restore_video": "需修复视频",
+    "robot_actions": "需从观测生成机械臂动作",
+    "robot_rollout_preflight": "需在不打开串口的情况下检查运行条件",
+    "physical_robot_rollout": "需面向已校准机械臂的现场运行",
+    "screenshot_automation": "需截图自动化",
+    "shortcuts_folder_trigger": "需使用 macOS 快捷指令的 Folder 触发器",
+    "shortcuts_system_trigger": "需使用 macOS 快捷指令的系统截图事件",
+    "image_shortcut": "需把指定图像交给快捷指令",
+    "apple_native_images": "需由 Apple 设备模型接收原始图像",
+    "separated_audio": "需分离音轨",
+    "short_summary": "需短文本摘要",
+    "sound_events": "需声音事件标签",
+    "video_speaker": "需判断画面中的活跃说话人",
+    "video_tracking": "需视频对象跟踪",
+    "visual_media": "需提取图像或视频特征",
+    "visual_question": "需根据静态图像回答问题",
+    "tool_calls": "需生成函数调用参数",
+    "review": "需按问题复核输入材料"
+  },
+  "backends": {
+    "lfm-fast": {
+      "name": "Liquid AI LFM3-1.7B BF16",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "schema", "short_summary"],
+      "strength": "常驻的轻量模型。可给出与原文逐字核对的结构化字段和短摘要。",
+      "tradeoff": "遇到歧义或仍缺来源的字段，要核对原文。",
+      "license": {"name": "LFM Open License 1.0，商用需核对收入门槛", "policy": "conditional"},
+      "platform": {"macos": 26, "arm64": true},
+      "disk_gib": 4,
+      "source": "https://huggingface.co/LiquidAI/LFM3-1.7B-GGUF",
+      "recipe": "docs/deployment.md#lfm-fast",
+      "lfm_model": "lfm-fast",
+      "install": [["bin/install", "lfm-fast"], ["bin/register"]],
+      "mcp": {"server": "local-lfm", "tool": "extract_fields", "arguments": {}},
+      "local_cli": ["bin/lfm", "local", "extract_fields"],
+      "workflows": {
+        "summarize": {
+          "mcp": {"server": "local-lfm", "tool": "summarize", "arguments": {}},
+          "local_cli": ["bin/lfm", "local", "summarize"]
+        },
+        "compact-text": {"local_cli": ["bin/lfm", "chat", "lfm-fast"]}
+      },
+      "markers": ["backends/lfm/.venv/bin/python"]
+    },
+    "lfm-vision": {
+      "name": "Liquid AI LFM3-VL-2B BF16",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "visual_question"],
+      "strength": "回答截图或图像里的内容问题。",
+      "tradeoff": "MCP 读取显式暂存的静态 PNG/JPEG。原文坐标和结构交给 Vision OCR。",
+      "license": {"name": "LFM Open License 1.0，商用需核对收入门槛", "policy": "conditional"},
+      "platform": {"macos": 26, "arm64": true},
+      "disk_gib": 8,
+      "source": "https://huggingface.co/LiquidAI/LFM3-VL-2B-GGUF",
+      "recipe": "docs/deployment.md#lfm-vision",
+      "lfm_model": "lfm-vision",
+      "install": [["bin/install", "lfm-vision"], ["bin/register"]],
+      "mcp": {"server": "local-lfm", "tool": "inspect_image", "arguments": {}},
+      "local_cli": ["bin/lfm", "local", "inspect_image"],
+      "markers": ["backends/lfm/.venv/bin/python"]
+    },
+    "lfm-tools": {
+      "name": "Liquid AI LFM2.5-8B-A1B Q8_0",
+      "delivery": "cli",
+      "evidence": "verified",
+      "features": ["local_cli", "tool_calls"],
+      "strength": "能按调用方提供的工具描述生成工具名与参数。",
+      "tradeoff": "调用方解析与验证参数，并负责各工具的执行权限。",
+      "license": {"name": "LFM Open License 1.0，商用需核对收入门槛", "policy": "conditional"},
+      "platform": {"macos": 26, "arm64": true},
+      "disk_gib": 12,
+      "source": "https://huggingface.co/LiquidAI/LFM2.5-8B-A1B-GGUF",
+      "recipe": "docs/deployment.md#lfm-tools",
+      "lfm_model": "lfm-tools",
+      "install": [["bin/install", "lfm-tools"]],
+      "local_cli": ["bin/lfm", "chat", "lfm-tools"],
+      "evidence_note": "本机完成两次库存工具参数与结果往返，返回预期库存 37。",
+      "markers": ["backends/lfm/.venv/bin/python"]
+    },
+    "lfm-reason": {
+      "name": "Liquid AI LFM2.5-24B-A2B Q8_0",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "review"],
+      "strength": "可作独立复核，也可供隔离的 Codex 或 Claude Code 试跑本地 provider。",
+      "tradeoff": "冷加载与统一内存开销较高。先用合成样本检验输出和工具兼容性。",
+      "license": {"name": "LFM Open License 1.0，商用需核对收入门槛", "policy": "conditional"},
+      "platform": {"macos": 26, "arm64": true},
+      "disk_gib": 28,
+      "source": "https://huggingface.co/LiquidAI/LFM2.5-24B-A2B-GGUF",
+      "recipe": "docs/deployment.md#lfm-reason",
+      "lfm_model": "lfm-reason",
+      "install": [["bin/install", "lfm-reason"], ["bin/register"]],
+      "mcp": {"server": "local-lfm", "tool": "review", "arguments": {}},
+      "local_cli": ["bin/lfm", "local", "review"],
+      "evidence_note": "通过 1 GB 差额复核、工具结果收尾，以及 Codex 和 Claude Code 本地文件读取。",
+      "markers": ["backends/lfm/.venv/bin/python"]
+    },
+    "lfm-fast-q4": {
+      "name": "Liquid AI LFM3-1.7B Q4_K_M",
+      "delivery": "cli",
+      "evidence": "verified",
+      "features": ["local_cli", "short_summary"],
+      "strength": "同家族较小的 GGUF，可和 BF16 同机比较。",
+      "tradeoff": "此部署选项依然包含常驻 BF16。按任务比较量化后的字段与摘要质量。",
+      "license": {"name": "LFM Open License 1.0，商用需核对收入门槛", "policy": "conditional"},
+      "platform": {"macos": 26, "arm64": true},
+      "disk_gib": 5,
+      "source": "https://huggingface.co/LiquidAI/LFM3-1.7B-GGUF",
+      "recipe": "docs/deployment.md#lfm-quantization",
+      "lfm_model": "lfm-fast-q4",
+      "install": [["bin/install", "lfm-fast-q4"]],
+      "local_cli": ["bin/lfm", "chat", "lfm-fast-q4"],
+      "markers": ["backends/lfm/.venv/bin/python"]
+    },
+    "lfm-reason-q4": {
+      "name": "Liquid AI LFM2.5-24B-A2B Q4_K_M",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "review"],
+      "strength": "同家族低内存复核候选。可直接对比 Q8。",
+      "tradeoff": "用同一份复核样例比较事实和原文引证。",
+      "license": {"name": "LFM Open License 1.0，商用需核对收入门槛", "policy": "conditional"},
+      "platform": {"macos": 26, "arm64": true},
+      "disk_gib": 18,
+      "source": "https://huggingface.co/LiquidAI/LFM2.5-24B-A2B-GGUF",
+      "recipe": "docs/deployment.md#lfm-quantization",
+      "lfm_model": "lfm-reason-q4",
+      "install": [["bin/install", "lfm-reason-q4"], ["bin/register"]],
+      "mcp": {"server": "local-lfm", "tool": "review", "arguments": {"model": "lfm-reason-q4"}},
+      "local_cli": ["bin/lfm", "local", "review"],
+      "evidence_note": "与 Q8 使用同一份合成材料复核，均给出来源数字和 1 GB 差额。更复杂的复核和工具行为仍需对照。",
+      "markers": ["backends/lfm/.venv/bin/python"]
+    },
+    "pdfkit": {
+      "name": "Apple PDFKit",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli"
+      ],
+      "strength": "直接提取已有 PDF 文字与页码。",
+      "tradeoff": "PDF 有可用文字层时最合适。复杂阅读顺序、表格坐标和扫描图需复核。",
+      "license": {
+        "name": "macOS 系统框架，适用 Apple 软件条款",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://developer.apple.com/documentation/pdfkit/pdfpage/string",
+      "recipe": "docs/deployment.md#pdfkit",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "document",
+        "arguments": {
+          "backend": "auto"
+        }
+      },
+      "local_cli": [
+        "bin/local",
+        "document"
+      ],
+      "markers": [
+        "native/.build/release/apple-specialists"
+      ],
+      "evidence_note": "此路线以 PDFKit 实际读到文字层为前提。"
+    },
+    "vision": {
+      "name": "Apple Vision OCR / Document Recognition",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "boxes",
+        "table_structure"
+      ],
+      "strength": "不用额外权重下载。支持扫描页、文字行、坐标和检出的表格。",
+      "tradeoff": "复杂公式、合并单元格或多栏阅读顺序需查看原页。不提供独立的段落树。",
+      "license": {
+        "name": "macOS 系统框架，适用 Apple 软件条款",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://developer.apple.com/documentation/vision/recognizedocumentsrequest",
+      "recipe": "docs/deployment.md#vision",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "document",
+        "arguments": {
+          "backend": "vision"
+        }
+      },
+      "local_cli": [
+        "bin/local",
+        "document"
+      ],
+      "markers": [
+        "native/.build/release/apple-specialists"
+      ]
+    },
+    "paddle": {
+      "name": "PaddleOCR-VL 1.6 + PP-DocLayoutV3",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "boxes",
+        "table_structure",
+        "formula_markup"
+      ],
+      "strength": "版面检测与区域识别结合。返回表格、公式候选、Markdown 和区域位置。",
+      "tradeoff": "需另外安装两个运行环境和模型。按页处理，跨页表格需要另行拼接。",
+      "license": {
+        "name": "Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://www.paddleocr.ai/main/en/version3.x/pipeline_usage/PaddleOCR-VL-Apple-Silicon.html",
+      "recipe": "docs/deployment.md#paddle",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/install",
+          "paddle"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "document",
+        "arguments": {
+          "backend": "paddle"
+        }
+      },
+      "local_cli": [
+        "bin/local",
+        "document"
+      ],
+      "markers": [
+        "native/.build/release/apple-specialists",
+        ".runtime/paddle/bin/python",
+        ".runtime/models/paddle/.verified",
+        ".runtime/models/layout/.verified",
+        ".runtime/mlx-vlm/bin/python"
+      ],
+      "disk_gib": 5,
+      "evidence_note": "在含求和与带根式积分的合成页返回两个公式的 LaTeX 和区域坐标。"
+    },
+    "minicpm": {
+      "name": "MiniCPM-OCR 1.0 8-bit (MLX)",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "formula_markup"
+      ],
+      "strength": "单页图像到 Markdown，作为疑难页的第二套识别模型。",
+      "tradeoff": "本接入直接识别整页图像，不输出逐块坐标，也不含官方 SDK 的版面检测。",
+      "license": {
+        "name": "Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://huggingface.co/openbmb/MiniCPM-OCR-1.0",
+      "recipe": "docs/deployment.md#minicpm",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/install",
+          "minicpm"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "document",
+        "arguments": {
+          "backend": "minicpm"
+        }
+      },
+      "local_cli": [
+        "bin/local",
+        "document"
+      ],
+      "markers": [
+        "native/.build/release/apple-specialists",
+        ".runtime/mlx-vlm/bin/python",
+        ".runtime/models/minicpm/.verified"
+      ],
+      "disk_gib": 5,
+      "evidence_note": "含求和与带根式积分的合成页返回两条公式和对应编号。"
+    },
+    "jev": {
+      "name": "MiniCPM-OCR Jev 8-bit (MLX)",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "candidate_score"
+      ],
+      "strength": "独立检查候选 OCR 文本、原始裁图和文本渲染图的一致性。",
+      "tradeoff": "需要同一区域的原图和候选渲染图。需按文档类型标注样本校准，分数用于筛选复核。",
+      "license": {
+        "name": "Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://github.com/OpenBMB/MiniCPM-OCR/blob/main/docs/minicpm_ocr_jev_tutorial_en.md",
+      "recipe": "docs/deployment.md#jev",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/install",
+          "jev"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "score_ocr",
+        "arguments": {}
+      },
+      "local_cli": [
+        "bin/local",
+        "score_ocr"
+      ],
+      "markers": [
+        ".runtime/mlx-vlm/bin/python",
+        ".runtime/models/jev/.verified"
+      ],
+      "disk_gib": 5,
+      "prerequisites": [
+        "原始区域图、候选文字、该文字渲染图。"
+      ],
+      "evidence_note": "已用 OpenBMB 的错误样例通过评分调用，未校准文档阈值。"
+    },
+    "barcodes": {
+      "name": "Apple Vision Barcode Detection",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "boxes"
+      ],
+      "strength": "直接返回照片或 PDF 页上的条码类型、值、置信度和坐标。",
+      "tradeoff": "输出是输入中的数据。应用不得自动打开编码的链接。",
+      "license": {
+        "name": "macOS 系统框架，适用 Apple 软件条款",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://developer.apple.com/documentation/vision/detectbarcodesrequest",
+      "recipe": "docs/deployment.md#barcodes",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "document",
+        "arguments": {
+          "backend": "barcodes"
+        }
+      },
+      "local_cli": [
+        "bin/local",
+        "document"
+      ],
+      "markers": [
+        "native/.build/release/apple-specialists"
+      ]
+    },
+    "apple-speech": {
+      "name": "Apple SpeechTranscriber",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "segment_timestamps"
+      ],
+      "strength": "低维护的文件转写，中英文资源由系统管理。",
+      "tradeoff": "当前提供段时间，缺少匿名说话人标签。需先准备目标 locale。",
+      "license": {
+        "name": "macOS 系统框架，适用 Apple 软件条款",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://developer.apple.com/documentation/speech/speechtranscriber",
+      "recipe": "docs/deployment.md#apple-speech",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/install",
+          "speech",
+          "<locale>"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "transcribe",
+        "arguments": {
+          "backend": "apple"
+        }
+      },
+      "local_cli": [
+        "bin/local",
+        "transcribe"
+      ],
+      "markers": [
+        "native/.build/release/apple-specialists"
+      ],
+      "probe": "speech"
+    },
+    "moss": {
+      "name": "MOSS-Transcribe-Diarize 8-bit (MLX)",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "segment_timestamps",
+        "speaker_labels"
+      ],
+      "strength": "一步输出多人转写、时间区间和匿名发言编号。",
+      "tradeoff": "编号仅对本录音有效。长录音、重叠发言和生成长度需检查。本 MCP 输入上限 30 分钟。",
+      "license": {
+        "name": "Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://github.com/vanch007/mlx-MOSS-Transcribe-Diarize",
+      "recipe": "docs/deployment.md#moss",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/install",
+          "moss"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "transcribe",
+        "arguments": {
+          "backend": "moss"
+        }
+      },
+      "local_cli": [
+        "bin/local",
+        "transcribe"
+      ],
+      "markers": [
+        ".runtime/moss/bin/python",
+        ".runtime/models/moss/.verified"
+      ],
+      "disk_gib": 6
+    },
+    "qwen-asr": {
+      "name": "Qwen3-ASR 0.6B 8-bit + ForcedAligner (MLX)",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "word_timestamps"
+      ],
+      "strength": "适合需要词或语言单元时间戳的转写，复用原始音频做对齐。",
+      "tradeoff": "此路径没有说话人归属。非 WAV 格式可能需要 ffmpeg。对齐语言有独立限制。",
+      "license": {
+        "name": "Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://github.com/moona3k/mlx-qwen3-asr",
+      "recipe": "docs/deployment.md#qwen-asr",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/install",
+          "qwen"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "transcribe",
+        "arguments": {
+          "backend": "qwen"
+        }
+      },
+      "local_cli": [
+        "bin/local",
+        "transcribe"
+      ],
+      "markers": [
+        ".runtime/qwen/bin/python",
+        ".runtime/models/qwen-asr/.verified",
+        ".runtime/models/qwen-align/.verified"
+      ],
+      "disk_gib": 5
+    },
+    "qwen-large": {
+      "name": "Qwen3-ASR 1.7B 8-bit + ForcedAligner (MLX)",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "word_timestamps",
+        "asr_1_7b"
+      ],
+      "strength": "使用调研中指定的 1.7B 识别器，复用同一套词级时间接口。",
+      "tradeoff": "权重比 0.6B 大。先用目标口音和术语比较转写与耗时。此路径无说话人标签。",
+      "license": {
+        "name": "Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://huggingface.co/moona3k/mlx-qwen3-asr-1.7b-8bit",
+      "recipe": "docs/deployment.md#qwen-large",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/install",
+          "qwen-large"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "transcribe",
+        "arguments": {
+          "backend": "qwen-large"
+        }
+      },
+      "local_cli": [
+        "bin/local",
+        "transcribe"
+      ],
+      "markers": [
+        ".runtime/qwen/bin/python",
+        ".runtime/models/qwen-large/.verified",
+        ".runtime/models/qwen-align/.verified"
+      ],
+      "disk_gib": 6
+    },
+    "qwen-align": {
+      "name": "Qwen3-ForcedAligner 0.6B (MLX)",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "word_timestamps",
+        "corrected_transcript"
+      ],
+      "strength": "给已经校订的文本对齐时间，结果可回到音频逐词或逐语言单元检查。",
+      "tradeoff": "使用同一段原始录音及正确语言。对齐不会修正错别字，当前单次最多 120 秒。",
+      "license": {
+        "name": "Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://github.com/QwenLM/Qwen3-ASR",
+      "recipe": "docs/deployment.md#qwen-align",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/install",
+          "qwen-align"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "align_audio",
+        "arguments": {}
+      },
+      "local_cli": [
+        "bin/local",
+        "align_audio"
+      ],
+      "markers": [
+        ".runtime/qwen/bin/python",
+        ".runtime/models/qwen-align/.verified"
+      ],
+      "disk_gib": 4
+    },
+    "speech-detector": {
+      "name": "Apple SpeechDetector",
+      "delivery": "mcp",
+      "evidence": "integrated",
+      "features": ["local_cli"],
+      "strength": "在 SpeechAnalyzer 内部用 VAD 降低转写功耗。",
+      "tradeoff": "Apple 文档说明当前结果流只用于报错，本机文件模式未输出语音区间。",
+      "license": {
+        "name": "macOS 系统框架，适用 Apple 软件条款",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://developer.apple.com/documentation/speech/speechdetector",
+      "recipe": "docs/deployment.md#speech-detector",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/install",
+          "speech",
+          "<locale>"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "transcribe",
+        "arguments": {
+          "backend": "activity"
+        }
+      },
+      "local_cli": [
+        "bin/local",
+        "transcribe"
+      ],
+      "markers": [
+        "native/.build/release/apple-specialists"
+      ],
+      "probe": "speech",
+      "evidence_note": "本机文件模式返回空观察，与 Apple 对当前 API 的说明一致。"
+    },
+    "silero-vad": {
+      "name": "Silero VAD 6.2.2 ONNX",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "segment_timestamps", "vad_intervals"],
+      "strength": "在 CPU 上以 32 毫秒步进定位语音，不需要语种或转写模型。权重约 1.25 MB。",
+      "tradeoff": "需要 ffmpeg。检测小于 250 毫秒的声音或强噪声中的低声发言时需对照原音频。",
+      "license": {"name": "MIT", "policy": "permissive"},
+      "platform": {"macos": 26, "arm64": true},
+      "source": "https://github.com/snakers4/silero-vad/releases/tag/v6.2.2",
+      "recipe": "docs/deployment.md#silero-vad",
+      "install": [["bin/install", "silero"], ["bin/register"]],
+      "mcp": {"tool": "transcribe", "arguments": {"backend": "silero"}},
+      "local_cli": ["bin/local", "transcribe"],
+      "markers": [".runtime/silero/bin/python", ".runtime/models/silero-vad/.verified"],
+      "evidence_note": "带已知头尾静音的样本返回四个语音区间，纯静音返回空数组。"
+    },
+    "qwen-stream": {
+      "name": "Qwen3-ASR MLX 流式 CLI",
+      "delivery": "local",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "realtime",
+        "microphone_input"
+      ],
+      "strength": "从 stdin 接收连续 PCM，每个音频块输出暂定文本和稳定前缀，EOF 时输出终稿。",
+      "tradeoff": "输入须由本机音源提供 16 kHz 单声道 PCM。麦克风采集还需要 macOS 授权，延迟受设备和块长影响。",
+      "license": {
+        "name": "Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://github.com/moona3k/mlx-qwen3-asr#streaming",
+      "recipe": "docs/deployment.md#qwen-stream",
+      "install": [
+        [
+          "bin/install",
+          "qwen"
+        ]
+      ],
+      "local_cli": ["bin/stream-asr"],
+      "markers": [
+        ".runtime/qwen/bin/mlx-qwen3-asr",
+        ".runtime/models/qwen-asr/.verified"
+      ],
+      "evidence_note": "实速 PCM 与 Mac 内置麦克风均通过。麦克风以 1 秒块返回中间文本，合成编号在终稿前已出现。"
+    },
+    "qwen-stream-replay": {
+      "name": "Qwen3-ASR 流式回放",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli"],
+      "strength": "从已有录音回放连续分块，返回部分文本、稳定前缀和回滚次数。",
+      "tradeoff": "MCP 在请求结束后一次性返回时间线。需要边输入边接收时用 bin/stream-asr 的 PCM 管道。",
+      "license": {"name": "Apache-2.0", "policy": "permissive"},
+      "platform": {"macos": 26, "arm64": true},
+      "source": "https://github.com/moona3k/mlx-qwen3-asr#streaming",
+      "recipe": "docs/deployment.md#qwen-stream",
+      "install": [["bin/install", "core"], ["bin/install", "qwen"], ["bin/register"]],
+      "local_cli": ["bin/local", "transcribe"],
+      "mcp": {"tool": "transcribe", "arguments": {"backend": "qwen-stream"}},
+      "markers": [".runtime/qwen/bin/python", ".runtime/models/qwen-asr/.verified"],
+      "evidence_note": "合成录音回放返回 5 轮中间文本、2 次改写和完整的终稿。"
+    },
+    "omni": {
+      "name": "Omni / Jina v5 Omni Small",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "multimodal"
+      ],
+      "strength": "应用已提供本机多模态索引。MCP 调用本地 Unix socket。",
+      "tradeoff": "索引是候选线索。只索引明确选定的目录。代码与权重的许可不同。",
+      "license": {
+        "name": "代码 Apache-2.0，权重 CC BY-NC 4.0",
+        "policy": "noncommercial"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://jina.ai/models/jina-embeddings-v5-omni-small/",
+      "recipe": "docs/deployment.md#omni",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/install",
+          "omni"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "search",
+        "arguments": {
+          "backend": "omni"
+        }
+      },
+      "local_cli": [
+        "bin/local",
+        "search"
+      ],
+      "disk_gib": 7,
+      "app": "omni",
+      "prerequisites": [
+        "用安装器下载固定权重，再用 Omni CLI 建立指定目录的索引。"
+      ],
+      "evidence_note": "两客户端均核对合成文本。PDF 命中第 2 页。音频和视频命中文件；语义查询未给两份短素材返回时间码。"
+    },
+    "digup": {
+      "name": "DigUp / EmbeddingGemma 2 740M",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "multimodal",
+        "search_timecodes",
+        "exact_keywords",
+        "code_semantic"
+      ],
+      "strength": "Apache 权重的图文音视频混合检索，支持精确关键词。",
+      "tradeoff": "先为每个允许的目录建索引。严格阈值会漏掉小语料中的部分改写查询。可降低阈值召回候选，再查原文件。",
+      "license": {
+        "name": "App MIT，权重 Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://github.com/ARahim3/DigUp",
+      "recipe": "docs/deployment.md#digup",
+      "disk_gib": 3,
+      "support": "https://ai.google.dev/gemma/docs/embeddinggemma/model_card_2",
+      "install": [["bin/install", "core"], ["bin/install", "digup"], ["bin/register"]],
+      "local_cli": ["bin/local", "search"],
+      "mcp": {"tool": "search", "arguments": {"backend": "digup"}},
+      "workflows": {
+        "code-search": {"mcp": {"tool": "search", "arguments": {"backend": "digup", "code": true}}}
+      },
+      "markers": [".runtime/digup/digup", ".runtime/models/digup/.verified"],
+      "probe": "digup",
+      "evidence_note": "定位了合成文本、截图、PDF 第 2 页、录音与视频片段和代码行。两种客户端均拿到同一录音区间。"
+    },
+    "omni-pairing": {
+      "name": "Omni 已链接 Mac 查询",
+      "delivery": "mcp",
+      "evidence": "integrated",
+      "features": [
+        "local_cli",
+        "multimodal",
+        "multi_mac"
+      ],
+      "strength": "按用途区分每台 Mac 的来源，可跨链接设备查找本地文件。",
+      "tradeoff": "需先配对，并在双方设定可分享的索引。MCP 按配置筛选返回路径。实体双机待验证，本阶段跳过。",
+      "license": {
+        "name": "代码 Apache-2.0，权重 CC BY-NC 4.0",
+        "policy": "noncommercial"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://github.com/hanxiao/omni-macos",
+      "recipe": "docs/deployment.md#omni-pairing",
+      "install": [["bin/install", "core"], ["bin/install", "omni"], ["bin/register"]],
+      "mcp": {"tool": "search_linked_mac", "arguments": {}},
+      "local_cli": ["bin/local", "search_linked_mac"],
+      "app": "omni",
+      "disk_gib": 4,
+      "evidence_note": "在同一台 Mac 的两个隔离实例通过配对、索引查询、原件校验和离线返回。Codex 与离线 Claude Code 均取得远端标记和行号。",
+      "prerequisites": [
+        "至少两台可配对的 Mac，每台都用选定资料验收。"
+      ]
+    },
+    "omni-linked-copy": {
+      "name": "Omni 已链接 Mac 原件取回",
+      "delivery": "mcp",
+      "evidence": "integrated",
+      "features": ["local_cli", "multi_mac", "linked_file_copy"],
+      "strength": "重查命中后将文件写入选定的本机目录，返回路径、字节数和 SHA-256。",
+      "tradeoff": "需对端允许读取文件，搜索命中需带有不超过 16 MiB 的大小元数据。实体双机待验证，本阶段跳过。",
+      "license": {"name": "代码 Apache-2.0，权重 CC BY-NC 4.0", "policy": "noncommercial"},
+      "platform": {"macos": 26, "arm64": true},
+      "source": "https://github.com/hanxiao/omni-macos/blob/v0.20.5/docs/CLI.md",
+      "recipe": "docs/deployment.md#omni-linked-copy",
+      "install": [["bin/install", "core"], ["bin/install", "omni"], ["bin/register"]],
+      "mcp": {"tool": "fetch_linked_mac", "arguments": {}},
+      "local_cli": ["bin/local", "fetch_linked_mac"],
+      "app": "omni",
+      "disk_gib": 4,
+      "evidence_note": "同一台 Mac 上的两个真实隔离实例加密配对。Codex 和离线 Claude Code 都取得字节一致的副本。"
+    },
+    "spotlight": {
+      "name": "Apple Spotlight 文件名搜索",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "exact_keywords"
+      ],
+      "strength": "利用系统的现有元数据索引，无需生成向量。",
+      "tradeoff": "覆盖范围取决于目录、系统设置和当前索引状态。",
+      "license": {
+        "name": "macOS 系统框架，适用 Apple 软件条款",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://support.apple.com/guide/mac-help/search-with-spotlight-mchlp1008/mac",
+      "recipe": "docs/deployment.md#spotlight",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "search",
+        "arguments": {
+          "backend": "spotlight"
+        }
+      },
+      "local_cli": [
+        "bin/local",
+        "search"
+      ],
+      "probe": "spotlight",
+      "evidence_note": "通过本机 CLI 从合成目录找到已知文件名。"
+    },
+    "core-spotlight": {
+      "name": "Apple SpotlightSearchTool App 索引",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "app_index_tool"
+      ],
+      "strength": "设备模型调用系统搜索工具检索指定的 App 笔记，返回独立的原文命中。可先改写成短关键词。",
+      "tradeoff": "需要 Apple Intelligence，一次处理一组短笔记。",
+      "license": {
+        "name": "macOS 系统框架，适用 Apple 软件条款",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 27,
+        "arm64": true
+      },
+      "source": "https://developer.apple.com/documentation/corespotlight/searching-indexed-content-with-natural-language",
+      "recipe": "docs/deployment.md#core-spotlight",
+      "install": [["bin/install", "core"], ["bin/install", "apple-spotlight"], ["bin/register"]],
+      "local_cli": ["bin/local", "search_apple_notes"],
+      "mcp": {"tool": "search_apple_notes", "arguments": {}},
+      "markers": [".runtime/apple-spotlight/Current.app/Contents/MacOS/LocalSpotlight"],
+      "probe": "apple_intelligence",
+      "evidence_note": "自有合成笔记的标题查到原文。描述性问题通过换关键词命中同一条笔记。"
+    },
+    "core-spotlight-semantic": {
+      "name": "Apple Core Spotlight 语义检索",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "app_semantic_index"],
+      "strength": "用 CSUserQuery 的系统词面与语义排序检索指定短笔记，直接返回原文。",
+      "tradeoff": "同义词覆盖依查询和系统语言而变，可能漏掉相关笔记。",
+      "license": {"name": "macOS 系统框架，适用 Apple 软件条款", "policy": "permissive"},
+      "platform": {"macos": 27, "arm64": true},
+      "source": "https://developer.apple.com/documentation/corespotlight/building-a-search-interface-for-your-app",
+      "recipe": "docs/deployment.md#core-spotlight-semantic",
+      "install": [["bin/install", "core"], ["bin/install", "apple-spotlight"], ["bin/register"]],
+      "local_cli": ["bin/local", "search_apple_notes"],
+      "mcp": {"tool": "search_apple_notes", "arguments": {"mode": "semantic"}},
+      "markers": [".runtime/apple-spotlight/Current.app/Contents/MacOS/LocalSpotlight", ".runtime/apple-spotlight/Current.app/Contents/Resources/native-ranked-query"],
+      "evidence_note": "pastries made with tree nuts 命中杏仁饼干原文，单独用词面搜索相同查询没有命中。marine mammals 的同义检索仍漏掉海豹。"
+    },
+    "jina-grep": {
+      "name": "Jina Code Embeddings 0.5B MLX",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "code_semantic",
+        "unindexed_code"
+      ],
+      "strength": "直接按行为给指定的源文件片段排序并返回行号，无需索引。",
+      "tradeoff": "适合已圈定的少量文件。整仓重复搜索可用 DigUp；已知标识符可用 rg 或语言服务器。",
+      "license": {
+        "name": "Jina 0.5B MLX 权重 CC BY-NC 4.0",
+        "policy": "noncommercial"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://github.com/jina-ai/jina-grep-cli",
+      "recipe": "docs/deployment.md#jina-grep",
+      "support": "https://huggingface.co/jinaai/jina-code-embeddings-0.5b-mlx",
+      "install": [["bin/install", "core"], ["bin/install", "jina-grep"], ["bin/register"]],
+      "mcp": {"tool": "search_code", "arguments": {}},
+      "local_cli": ["bin/local", "search_code"],
+      "markers": [".runtime/mlx-vlm/bin/python", ".runtime/models/jina-code-05/.verified"],
+      "disk_gib": 3,
+      "evidence_note": "五个合成文件的行为查询中，两个客户端均首选 retries.py 第 1–3 行。"
+    },
+    "qwen-reranker": {
+      "name": "Qwen3-VL-Reranker-2B",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "visual_reranking"
+      ],
+      "strength": "对已召回的候选图文页做第二阶段相关性打分。",
+      "tradeoff": "需要第一轮候选和原页图像。每个候选都要评分，成本随候选数增长。",
+      "license": {
+        "name": "Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://huggingface.co/Qwen/Qwen3-VL-Reranker-2B",
+      "recipe": "docs/deployment.md#qwen-reranker",
+      "support": "https://huggingface.co/Qwen/Qwen3-VL-Reranker-2B#usage",
+      "install": [["bin/install", "core"], ["bin/install", "qwen-reranker"], ["bin/register"]],
+      "mcp": {"tool": "rerank_visual", "arguments": {}},
+      "local_cli": ["bin/local", "rerank_visual"],
+      "markers": [".runtime/mlx-vlm/bin/python", ".runtime/models/qwen-reranker/.verified"],
+      "disk_gib": 7,
+      "evidence_note": "扫描 PDF 第 2 页在两端均排首位，另用猫图、条码图和无关文字混合验证。"
+    },
+    "qwen-reranker-4bit": {
+      "name": "Qwen3-VL-Reranker-2B MLX 4-bit",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "visual_reranking", "compact_visual_reranker"],
+      "strength": "权重 1.78 GB，沿用相同的图文候选接口和官方评分模板。",
+      "tradeoff": "两组样本首选与 BF16 一致，分数明显较低。量化版本切换后需重新标定阈值。",
+      "license": {"name": "Apache-2.0", "policy": "permissive"},
+      "platform": {"macos": 26, "arm64": true},
+      "source": "https://huggingface.co/mlx-community/Qwen3-VL-Reranker-2B-4bit",
+      "recipe": "docs/deployment.md#qwen-reranker",
+      "install": [["bin/install", "core"], ["bin/install", "qwen-reranker-4bit"], ["bin/register"]],
+      "mcp": {"tool": "rerank_visual", "arguments": {"precision": "4bit"}},
+      "local_cli": ["bin/local", "rerank_visual"],
+      "markers": [".runtime/mlx-vlm/bin/python", ".runtime/models/qwen-reranker-4bit/.verified"],
+      "disk_gib": 3,
+      "evidence_note": "扫描 PDF 第 2 页和猫图在各自测试中均仍排首位。"
+    },
+    "apple-translation": {
+      "name": "Apple Translation",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "batch_translation"
+      ],
+      "strength": "系统管理语言包。可不用额外机器学习运行时做短文本或批量翻译。",
+      "tradeoff": "只处理系统支持且已安装的语言对。没有自定义术语表。",
+      "license": {
+        "name": "macOS 系统框架，适用 Apple 软件条款",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://developer.apple.com/documentation/translation/translationsession",
+      "recipe": "docs/deployment.md#apple-translation",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "translate",
+        "arguments": {
+          "backend": "apple"
+        }
+      },
+      "local_cli": [
+        "bin/local",
+        "translate"
+      ],
+      "markers": [
+        "native/.build/release/apple-specialists"
+      ],
+      "probe": "apple_translation",
+      "evidence_note": "本机用已安装的英语和简体中文语言资源验证批量输出。"
+    },
+    "hy-mt": {
+      "name": "腾讯 Hy-MT2 1.8B 8-bit (MLX)",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "batch_translation",
+        "glossary"
+      ],
+      "strength": "逐条翻译，接受术语表提示。适合用短批次处理大量文本后复核。",
+      "tradeoff": "术语是提示，需核对实际命中。跨段一致性和字幕时间轴由调用方维护。7B 见上游选装。",
+      "license": {
+        "name": "Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://github.com/Tencent-Hunyuan/Hy-MT2",
+      "recipe": "docs/deployment.md#hy-mt",
+      "support": "https://huggingface.co/tencent/Hy-MT2-1.8B",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/install",
+          "hy-mt"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "translate",
+        "arguments": {
+          "backend": "hy-mt"
+        }
+      },
+      "local_cli": [
+        "bin/local",
+        "translate"
+      ],
+      "markers": [
+        ".runtime/translation/bin/python",
+        ".runtime/models/hy-mt/.verified"
+      ],
+      "disk_gib": 5,
+      "evidence_note": "本机验证了英译简中及术语提示。"
+    },
+    "natural-language": {
+      "name": "Apple Natural Language",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "token_spans"
+      ],
+      "strength": "快速识别语言、分词、词性和内置人名地名机构标签。",
+      "tradeoff": "输出范围受系统支持语言与标签范围限制。自定义字段用专用抽取工具。",
+      "license": {
+        "name": "macOS 系统框架，适用 Apple 软件条款",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://developer.apple.com/documentation/naturallanguage",
+      "recipe": "docs/deployment.md#natural-language",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "text_analysis",
+        "arguments": {}
+      },
+      "local_cli": [
+        "bin/local",
+        "text_analysis"
+      ],
+      "markers": [
+        "native/.build/release/apple-specialists"
+      ]
+    },
+    "apple-fm-python": {
+      "name": "Apple Foundation Models Python SDK",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "tool_calls"],
+      "strength": "由系统设备模型决定要读哪个键，用 Python 回调读取本机记录并返回可核验的原值。Python 也可直接定义自有工具。",
+      "tradeoff": "依赖 Apple Intelligence 和 Apple SDK。本机 26.5 SDK 路线通过文字、工具回调和结构化输出，图像附件需要 27 SDK。",
+      "license": {"name": "Python SDK Apache-2.0，系统模型适用 Apple 软件条款", "policy": "permissive"},
+      "platform": {"macos": 26, "arm64": true},
+      "source": "https://github.com/apple/python-apple-fm-sdk",
+      "recipe": "docs/deployment.md#apple-fm-python",
+      "install": [["bin/install", "core"], ["bin/install", "apple-fm-python"], ["bin/register"]],
+      "local_cli": ["bin/local", "lookup_apple_record"],
+      "mcp": {"tool": "lookup_apple_record", "arguments": {}},
+      "markers": [".runtime/apple-fm-sdk/current/.verified"],
+      "probe": "apple_intelligence",
+      "evidence_note": "设备模型按精确键调用了 Python 工具，读取合成记录中的编号。"
+    },
+    "apple-fm-image": {
+      "name": "Apple Foundation Models 原生图像问答",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "apple_native_images"],
+      "strength": "设备模型直接接收图像像素及问题，适合颜色、物体和空间关系单问。",
+      "tradeoff": "需要 macOS 27、用 27 SDK 构建的绑定及 Apple Intelligence。需逐字可靠的文字和坐标时用 Vision OCR。",
+      "license": {"name": "Python SDK Apache-2.0，系统模型适用 Apple 软件条款", "policy": "permissive"},
+      "platform": {"macos": 27, "arm64": true},
+      "source": "https://developer.apple.com/documentation/FoundationModels/analyzing-images-with-multimodal-prompting",
+      "recipe": "docs/deployment.md#apple-fm-image",
+      "install": [["bin/install", "core"], ["bin/install", "apple-fm-python"], ["bin/register"]],
+      "local_cli": ["bin/local", "inspect_apple_attachment"],
+      "mcp": {"tool": "inspect_apple_attachment", "arguments": {}},
+      "markers": [".runtime/apple-fm-sdk/current/.verified"],
+      "probe": "apple_attachment",
+      "evidence_note": "原生 ImageAttachment 对两张无文字图片分别识别为左上绿色圆形和左上绿色三角形。"
+    },
+    "foundation-models": {
+      "name": "Apple Foundation Models 短文本问答",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "short_summary"
+      ],
+      "strength": "系统模型对短材料做聚焦问答、摘要或片段筛选。",
+      "tradeoff": "需启用 Apple Intelligence。当前 MCP 提供短文本自由回答。",
+      "license": {
+        "name": "macOS 系统框架，适用 Apple 软件条款",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://developer.apple.com/documentation/foundationmodels",
+      "recipe": "docs/deployment.md#foundation-models",
+      "install": [
+        [
+          "bin/install",
+          "core"
+        ],
+        [
+          "bin/register"
+        ]
+      ],
+      "mcp": {
+        "tool": "focus_text",
+        "arguments": {}
+      },
+      "local_cli": [
+        "bin/local",
+        "focus_text"
+      ],
+      "markers": [
+        "native/.build/release/apple-specialists"
+      ],
+      "probe": "apple_intelligence"
+    },
+    "foundation-structured": {
+      "name": "Apple Foundation Models 结构化生成",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "schema"
+      ],
+      "strength": "用 Swift 动态 schema 从短文本中提取可核对的字段，模型省略或输出空白的字段返回 null。无需下载第三方权重。",
+      "tradeoff": "需要启用 Apple Intelligence，最多八个字符串字段。遇到「待定」等措辞可能原样返回，需核对已确认值。",
+      "license": {
+        "name": "macOS 系统框架，适用 Apple 软件条款",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://developer.apple.com/documentation/foundationmodels/generating-swift-data-structures-with-guided-generation",
+      "recipe": "docs/deployment.md#foundation-structured",
+      "support": "https://github.com/apple/python-apple-fm-sdk",
+      "install": [["bin/install", "core"], ["bin/register"]],
+      "mcp": {"tool": "extract_apple_fields", "arguments": {}},
+      "local_cli": ["bin/local", "extract_apple_fields"],
+      "markers": ["native/.build/release/apple-specialists"],
+      "probe": "apple_intelligence",
+      "evidence_note": "macOS 27.2.1 上用 Swift 动态 schema 得到预期英文原文和空字段。"
+    },
+    "gliner": {
+      "name": "GLiNER2.5 multi-v1 287M",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "schema",
+        "token_spans"
+      ],
+      "strength": "用自定义标签定义实体类型，批量定位原文跨度并返回置信度。",
+      "tradeoff": "本工具调用实体抽取。关系抽取走上游 API。阈值和召回需用目标材料校准。",
+      "license": {
+        "name": "Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "disk_gib": 4,
+      "source": "https://huggingface.co/fastino/gliner2.5-multi-v1",
+      "recipe": "docs/deployment.md#gliner",
+      "install": [["bin/install", "core"], ["bin/install", "gliner"], ["bin/register"]],
+      "mcp": {"tool": "extract_entities", "arguments": {}},
+      "local_cli": ["bin/local", "extract_entities"],
+      "markers": [".runtime/gliner/bin/python", ".runtime/models/gliner/.verified"],
+      "evidence_note": "英文、中文与混语样本验证了人名、城市及原文跨度。Codex 与 Claude Code 均调用了中文样本。",
+      "support": "https://github.com/fastino-ai/GLiNER2"
+    },
+    "privacy-filter": {
+      "name": "OpenAI Privacy Filter",
+      "delivery": "local",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "redaction",
+        "token_spans"
+      ],
+      "strength": "本地标出和替换常见敏感文本字段，提供原文位置用于复核。",
+      "tradeoff": "有漏检和范围外信息。敏感文本通过本地 CLI 处理，保留任何出机片段的授权判断。",
+      "license": {
+        "name": "Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://github.com/openai/privacy-filter",
+      "recipe": "docs/deployment.md#privacy-filter",
+      "support": "https://huggingface.co/openai/privacy-filter",
+      "disk_gib": 6,
+      "install": [
+        [
+          "bin/install",
+          "privacy"
+        ]
+      ],
+      "local_cli": [
+        "bin/redact"
+      ],
+      "markers": [
+        ".runtime/privacy/bin/opf",
+        ".runtime/models/privacy/.verified",
+        ".runtime/models/privacy/tiktoken/fb374d419588a4632f3f557e76b4b70aebbca790"
+      ],
+      "evidence_note": "离线 Codex 与离线 Claude Code 均用本机词表和权重替换合成人名、日期、电邮及电话。另一份样例曾漏掉人名。"
+    },
+    "clef": {
+      "name": "Cloudflare Clef-Flash 9B MLX 4-bit",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "schema",
+        "choice_scores"
+      ],
+      "strength": "同一次推理为文字或图片上的二元判断、多选项和有序分档打分。",
+      "tradeoff": "验证每种任务的误分率和阈值。图片和文字会占用同一上下文。",
+      "license": {
+        "name": "原模型和 MLX 4-bit 权重 Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://huggingface.co/Cloudflare/clef-flash",
+      "recipe": "docs/deployment.md#clef",
+      "install": [["bin/install", "clef"], ["bin/register"]],
+      "mcp": {"tool": "decide", "arguments": {}},
+      "local_cli": ["bin/local", "decide"],
+      "markers": [".runtime/mlx-vlm/bin/python", ".runtime/models/clef-flash-4bit/.verified"],
+      "disk_gib": 9,
+      "support": "https://huggingface.co/mlx-community/clef-flash-4bit",
+      "recommended_memory_gib": 16
+    },
+    "talknet": {
+      "name": "TalkNet-ASD PyTorch/MPS",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "video_speaker"
+      ],
+      "strength": "将同步音轨与画面中的说话人轨迹关联，输出时间区间、人脸框和标注视频。",
+      "tradeoff": "360° 视频需先投影，侧脸、画外说话和音画错位会影响结果。",
+      "license": {
+        "name": "代码 MIT，TalkSet 与 S3FD 权重条款未明确",
+        "policy": "review"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://github.com/nawta/TalkNet-ASD-py312",
+      "recipe": "docs/deployment.md#talknet",
+      "support": "https://github.com/TaoRuijie/TalkNet-ASD",
+      "install": [["bin/install", "core"], ["bin/install", "talknet"], ["bin/register"]],
+      "mcp": {"tool": "active_video_speakers", "arguments": {}},
+      "local_cli": ["bin/local", "active_video_speakers"],
+      "markers": [".runtime/talknet/bin/python", ".runtime/models/talknet/.verified"],
+      "disk_gib": 3,
+      "prerequisites": ["需要 PATH 上的 FFmpeg。"],
+      "evidence_note": "上游多人演示片的前 5 秒在 CPU 与 MPS 上输出一致，两个客户端报告同一活跃人脸轨迹。"
+    },
+    "sam3": {
+      "name": "Segment Anything 3 MLX",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "masks",
+        "video_tracking"
+      ],
+      "strength": "用文字定位对象，返回逐对象 PNG 掩膜、框，或带时间的短视频跨帧关联。",
+      "tradeoff": "跨帧编号由框重叠关联。遮挡、同类目标及镜头切换需复核。Meta 权重有专门条款。",
+      "license": {
+        "name": "SAM License",
+        "policy": "review"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://github.com/facebookresearch/sam3",
+      "recipe": "docs/deployment.md#sam3",
+      "support": "https://huggingface.co/mlx-community/sam3-bf16",
+      "install": [["bin/install", "core"], ["bin/install", "sam3"], ["bin/register"]],
+      "mcp": {"tool": "segment_objects", "arguments": {"task": "track"}},
+      "workflows": {"foreground-mask": {"mcp": {"tool": "segment_objects", "arguments": {"task": "segment"}}}},
+      "local_cli": ["bin/local", "segment_objects"],
+      "markers": [".runtime/mlx-vlm/bin/python", ".runtime/models/sam3/.verified"],
+      "disk_gib": 4,
+      "evidence_note": "修正 tokenizer 后，两只猫均生成满分辨率掩膜。合成移动街景的主车在四个采样点保持同一编号。"
+    },
+    "sam-audio": {
+      "name": "SAM Audio small MLX",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "separated_audio"
+      ],
+      "strength": "按声音描述从短录音分离目标和残余两条 48 kHz WAV。",
+      "tradeoff": "需复核串音、失真和漏分离。当前项目接口处理至多 30 秒的短片段。",
+      "license": {
+        "name": "SAM Audio License，核对用途和模型获取条件",
+        "policy": "review"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://huggingface.co/facebook/sam-audio-small",
+      "recipe": "docs/deployment.md#sam-audio",
+      "support": "https://huggingface.co/mlx-community/sam-audio-small",
+      "install": [["bin/install", "core"], ["bin/install", "sam-audio"], ["bin/register"]],
+      "mcp": {"tool": "separate_audio", "arguments": {}},
+      "local_cli": ["bin/local", "separate_audio"],
+      "markers": [".runtime/mlx-vlm/bin/python", ".runtime/models/sam-audio/.verified", ".runtime/sam-audio-hf/.verified"],
+      "disk_gib": 5,
+      "evidence_note": "5 秒人声加 440 Hz 合成底音，目标轨中的底音幅度降至输入约 2.1%。两客户端均取得两条 WAV。"
+    },
+    "apple-tts": {
+      "name": "macOS 系统语音合成",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "generated_audio"],
+      "strength": "用已安装的系统音色直接生成本机 WAV，支持指定音色与速度。",
+      "tradeoff": "音色和语言取决于系统资源。对话音色控制、混语和专名读法要试听。",
+      "license": {"name": "macOS 系统框架，适用 Apple 软件条款", "policy": "permissive"},
+      "platform": {"macos": 26, "arm64": true},
+      "source": "https://support.apple.com/guide/mac-help/mchlp2290/mac",
+      "recipe": "docs/deployment.md#apple-tts",
+      "install": [["bin/install", "core"], ["bin/register"]],
+      "mcp": {"tool": "synthesize_speech", "arguments": {}},
+      "local_cli": ["bin/local", "synthesize_speech"],
+      "markers": [".runtime/mcp/bin/python"],
+      "evidence_note": "macOS 27.2.1 的 Samantha 与 Tingting 都实际生成 22.05 kHz PCM WAV。"
+    },
+    "kokoro": {
+      "name": "Kokoro 82M on MLX Audio",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "generated_audio"
+      ],
+      "strength": "固定的中英音色和语言前端，生成 24 kHz PCM WAV，方便重复生成。",
+      "tradeoff": "另装 MLX、词典和音色。混语、专名和长稿需按目标文本复核。",
+      "license": {
+        "name": "Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://huggingface.co/hexgrad/Kokoro-82M",
+      "recipe": "docs/deployment.md#kokoro",
+      "support": "https://github.com/Neywa-Labs/mlx-audio/blob/main/docs/models/tts/kokoro.md",
+      "install": [["bin/install", "core"], ["bin/install", "kokoro"], ["bin/register"]],
+      "mcp": {"tool": "synthesize_speech", "arguments": {"backend": "kokoro"}},
+      "local_cli": ["bin/local", "synthesize_speech"],
+      "markers": [".runtime/kokoro/bin/python", ".runtime/models/kokoro/.verified"],
+      "disk_gib": 3,
+      "evidence_note": "af_heart 英语和 zf_xiaobei 普通话样本均生成 24 kHz PCM WAV，通过本机 ASR 复核内容。"
+    },
+    "swiftvr": {
+      "name": "SwiftVR 5B via MLX-Gen",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "restore_video"
+      ],
+      "strength": "在原分辨率进行单步视频修复，短片验收保留了帧数、帧率和可用音轨。",
+      "tradeoff": "会改变画面细节。两次与干净参考比较的 SSIM 均下降，需按素材判断是否采用。",
+      "license": {
+        "name": "SwiftVR Research License 1.0",
+        "policy": "research_only"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://huggingface.co/H-oliday/SwiftVR/tree/a0b09461bd89847712dd91dbb4c63541b4693936",
+      "recipe": "docs/deployment.md#swiftvr",
+      "install": [["bin/install", "swiftvr"], ["bin/register"]],
+      "mcp": {"tool": "restore_video", "arguments": {}},
+      "local_cli": ["bin/local", "restore_video"],
+      "markers": [".runtime/mlx-gen/bin/mlxgen", ".runtime/models/swiftvr/.verified"],
+      "disk_gib": 25,
+      "evidence_note": "320 × 192、9 帧、8 fps 的试验片段输出保留音轨及 1.125 秒时长。"
+    },
+    "seedvr2": {
+      "name": "SeedVR2-3B MLX 8-bit",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "restore_video",
+        "upscale_video",
+        "upscale_image"
+      ],
+      "strength": "可在同一个本机模型上修复和放大静图或视频，测试片段保留帧率、时长和音轨。",
+      "tradeoff": "视频 2 倍放大需显式开启上游的高内存模式。原尺寸测试与参考的 SSIM 低于输入。",
+      "license": {
+        "name": "MLX-Gen MIT，SeedVR2-3B 权重 Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://github.com/lpalbou/mlx-gen/blob/main/docs/upscaling.md",
+      "recipe": "docs/deployment.md#seedvr2",
+      "install": [["bin/install", "seedvr2"], ["bin/register"]],
+      "mcp": {"tool": "restore_video", "arguments": {"backend": "seedvr2"}},
+      "local_cli": ["bin/local", "restore_video"],
+      "workflows": {
+        "upscale-image": {
+          "mcp": {"tool": "restore_image", "arguments": {"scale": "2x"}},
+          "local_cli": ["bin/local", "restore_image"]
+        },
+        "upscale-video": {
+          "mcp": {"tool": "restore_video", "arguments": {"backend": "seedvr2", "scale": "2x"}},
+          "setup_note": "视频放大需显式设置 allow_high_memory=true。320 × 192 的 9 帧样本测得 MLX 峰值 52.71 GB。先用短片试跑。"
+        }
+      },
+      "markers": [".runtime/mlx-gen/bin/mlxgen", ".runtime/models/seedvr2-3b-8bit/.verified"],
+      "disk_gib": 7,
+      "evidence_note": "320 × 192 静图和带音频短片均成功放大为 640 × 384。9 帧视频的 MLX 峰值约 52.7 GB。",
+      "support": "https://huggingface.co/ByteDance-Seed/SeedVR2-3B"
+    },
+    "apple-video-upscale": {
+      "name": "Apple VideoToolbox Low-Latency Super Resolution",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "upscale_video", "native_video_upscale"],
+      "strength": "调用系统的 VideoToolbox 逐帧放大。本机试跑支持低分辨率短片 2 倍和 4 倍。",
+      "tradeoff": "倍率取决于设备和像素尺寸。该入口处理 SDR，输出 H.264 与 AAC。",
+      "license": {"name": "macOS 系统框架，适用 Apple 软件条款", "policy": "permissive"},
+      "platform": {"macos": 26, "arm64": true},
+      "source": "https://developer.apple.com/documentation/videotoolbox/vtlowlatencysuperresolutionscalerconfiguration",
+      "recipe": "docs/deployment.md#apple-video-upscale",
+      "install": [["bin/install", "core"], ["bin/register"]],
+      "mcp": {"tool": "restore_video", "arguments": {"backend": "apple", "scale": "2x"}},
+      "local_cli": ["bin/local", "restore_video"],
+      "workflows": {
+        "upscale-video-4x": {"mcp": {"tool": "restore_video", "arguments": {"backend": "apple", "scale": "4x"}}}
+      },
+      "markers": ["native/.build/release/apple-specialists"],
+      "probe": "video_scale",
+      "evidence_note": "320 × 192 短片通过 2 倍和 4 倍，4 倍输出 1280 × 768、9 帧及一条音轨。1920 × 1080 在该 Mac 未返回可用倍率。"
+    },
+    "timesfm": {
+      "name": "TimesFM 3.0 330M",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "forecasts",
+        "quantiles"
+      ],
+      "strength": "Google 的 MLX 后端支持多变量、仅历史和已知未来协变量，输出三个分位点。",
+      "tradeoff": "本机权重限非商业和非生产。与 Chronos-2 的误差排序随测试序列变化。",
+      "license": {
+        "name": "自托管 3.0 权重限非商业、非生产",
+        "policy": "noncommercial"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://github.com/google-research/timesfm",
+      "recipe": "docs/deployment.md#timesfm",
+      "support": "https://huggingface.co/google/timesfm-3.0-pytorch",
+      "install": [["bin/install", "core"], ["bin/install", "timesfm"], ["bin/register"]],
+      "mcp": {"tool": "forecast_series", "arguments": {"backend": "timesfm"}},
+      "local_cli": ["bin/local", "forecast_series"],
+      "markers": [".runtime/timesfm/bin/python", ".runtime/models/timesfm/.verified"],
+      "disk_gib": 3,
+      "evidence_note": "用两条合成目标及两种协变量输出八步有序分位数。两个客户端均返回同一短样本结果。"
+    },
+    "chronos": {
+      "name": "Chronos-2 120M",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "forecasts",
+        "quantiles"
+      ],
+      "strength": "在 CPU 上从同频目标与可选协变量生成 0.1、0.5、0.9 分位预测，附最近观测基线。",
+      "tradeoff": "误差与区间覆盖率需要用独立时间窗口验证。",
+      "license": {
+        "name": "Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "disk_gib": 4,
+      "source": "https://huggingface.co/amazon/chronos-2",
+      "recipe": "docs/deployment.md#chronos",
+      "install": [["bin/install", "core"], ["bin/install", "chronos"], ["bin/register"]],
+      "mcp": {"tool": "forecast_series", "arguments": {}},
+      "local_cli": ["bin/local", "forecast_series"],
+      "markers": [".runtime/chronos/bin/python", ".runtime/models/chronos/.verified"],
+      "evidence_note": "CPU 用两条合成目标及已知未来协变量输出六步预测。流量序列留出期 MAE 0.359，最近值基线 8.337，仅适用于该样本。",
+      "support": "https://github.com/amazon-science/chronos-forecasting"
+    },
+    "depth-anything": {
+      "name": "Depth Anything V2 Small Core ML",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "depth_map",
+        "core_ml",
+        "local_cli"
+      ],
+      "strength": "从单张图得到稠密相对深度，适合遮挡和前后顺序筛查。",
+      "tradeoff": "不直接提供公制距离或机器人坐标。反射和透明物体需检查。",
+      "license": {
+        "name": "Small 模型 Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://huggingface.co/apple/coreml-depth-anything-v2-small",
+      "recipe": "docs/deployment.md#depth-anything",
+      "install": [["bin/install", "depth-anything"], ["bin/register"]],
+      "mcp": {"tool": "estimate_depth", "arguments": {}},
+      "local_cli": ["bin/local", "estimate_depth"],
+      "markers": ["native/.build/release/apple-specialists", ".runtime/models/depth-anything/.verified"],
+      "evidence_note": "本机 Core ML 编译通过。在公开街景上，近处轿车、公交车和远处塔楼的顺序符合预期。两个客户端均实跑。",
+      "support": "https://github.com/DepthAnything/Depth-Anything-V2"
+    },
+    "lean-kernel": {
+      "name": "Lean 4.9 内核与公理审计",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "lean_checked"],
+      "strength": "检查已有代码，核对指定命题类型，并列出直接和间接使用的公理。",
+      "tradeoff": "项目内置 Lean 4.9 标准库；项目专用 mathlib 版本通过该项目的 Lake 运行。",
+      "license": {"name": "Lean 4 Apache-2.0", "policy": "permissive"},
+      "platform": {"macos": 26, "arm64": true},
+      "source": "https://lean-lang.org/doc/reference/latest/ValidatingProofs/",
+      "recipe": "docs/deployment.md#lean-kernel",
+      "install": [["bin/install", "core"], ["bin/install", "lean"], ["bin/register"]],
+      "mcp": {"tool": "check_lean_proof", "arguments": {}},
+      "local_cli": ["bin/local", "check_lean_proof"],
+      "markers": [".runtime/lean/bin/lean"],
+      "disk_gib": 2,
+      "evidence_note": "已验收有效证明、sorry、自定义公理及命题不符。"
+    },
+    "goedel": {
+      "name": "Goedel-Prover-V2 8B Q4_K_M + Lean",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "lean_checked"
+      ],
+      "strength": "用本机 GGUF 生成 Lean 代码，独立重放证明并核对给定的命题与公理。",
+      "tradeoff": "模型可能给出错误或不完整的候选。使用 Mathlib 要安装匹配的固定版本。",
+      "license": {
+        "name": "8B GGUF、Lean 与 mathlib Apache-2.0，llama.cpp MIT",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://github.com/Goedel-LM/Goedel-Prover-V2",
+      "recipe": "docs/deployment.md#goedel",
+      "install": [["bin/install", "core"], ["bin/install", "goedel"], ["bin/register"]],
+      "mcp": {"tool": "generate_lean_proof", "arguments": {}},
+      "local_cli": ["bin/local", "generate_lean_proof"],
+      "markers": [".runtime/models/goedel/.verified", ".runtime/lean/bin/lean"],
+      "evidence_note": "合取交换与 Mathlib 整数平方恒等式的生成结果均通过独立类型、公理及内核检查。",
+      "disk_gib": 12,
+      "support": "https://huggingface.co/mradermacher/Goedel-Prover-V2-8B-GGUF"
+    },
+    "smolvla": {
+      "name": "SmolVLA / LeRobot 离线动作预览",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "robot_actions"],
+      "strength": "用已记录的相机图、六维关节状态和文本，从 Mac CPU 或 GPU 生成候选动作序列。",
+      "tradeoff": "体现在指定相机和归一化空间的策略输出。新机械臂与任务需示教、标定及相应评估。",
+      "license": {"name": "Apache-2.0", "policy": "permissive"},
+      "platform": {"macos": 26, "arm64": true},
+      "source": "https://huggingface.co/lerobot/smolvla_base",
+      "recipe": "docs/deployment.md#smolvla",
+      "install": [["bin/install", "smolvla"], ["bin/register"]],
+      "mcp": {"tool": "preview_robot_actions", "arguments": {}},
+      "local_cli": ["bin/local", "preview_robot_actions"],
+      "markers": [".runtime/smolvla/bin/python", ".runtime/models/smolvla/.verified", ".runtime/models/smolvlm-config/.verified"],
+      "disk_gib": 5,
+      "evidence_note": "官方 SO100 示例的双相机图和关节状态在 CPU 与 MPS 均生成 50 × 6 动作。"
+    },
+    "smolvla-preflight": {
+      "name": "LeRobot SO-100／SO-101 运行前检查",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "robot_rollout_preflight"],
+      "strength": "检查串口枚举、原生电机驱动、六轴模型及校准元数据。",
+      "tradeoff": "检查在读取与枚举阶段完成。相机画面、硬件校准和任务效果需现场确认。",
+      "license": {"name": "Apache-2.0", "policy": "permissive"},
+      "platform": {"macos": 26, "arm64": true},
+      "source": "https://huggingface.co/docs/lerobot/main/en/inference",
+      "recipe": "docs/deployment.md#smolvla-preflight",
+      "install": [["bin/install", "core"], ["bin/install", "smolvla"], ["bin/register"]],
+      "mcp": {"tool": "check_smolvla_rollout", "arguments": {}},
+      "local_cli": ["bin/local", "check_smolvla_rollout"],
+      "markers": [".runtime/smolvla/bin/lerobot-rollout", ".runtime/smolvla/lib/python3.12/site-packages/serial/__init__.py", ".runtime/smolvla/lib/python3.12/site-packages/datasets/__init__.py", ".runtime/smolvla/lib/python3.12/site-packages/rustypot/__init__.py"],
+      "evidence_note": "固定 LeRobot 运行时可加载。当前 Mac 未枚举到测试指定的 USB 串口。"
+    },
+    "smolvla-rollout": {
+      "name": "SmolVLA / LeRobot",
+      "delivery": "upstream",
+      "evidence": "upstream",
+      "features": [
+        "local_cli",
+        "robot_actions",
+        "physical_robot_rollout"
+      ],
+      "strength": "把相机图、机器人状态和指令转成策略动作，可先离线回放。",
+      "tradeoff": "跨硬件与动作空间需适配。先在回放或仿真核对策略动作。真机待验证，本阶段跳过。",
+      "license": {
+        "name": "Apache-2.0",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://huggingface.co/docs/lerobot/main/en/smolvla",
+      "recipe": "docs/deployment.md#smolvla-rollout",
+      "install": [["bin/install", "smolvla"]],
+      "local_cli": [".runtime/smolvla/bin/lerobot-rollout"],
+      "support": "https://huggingface.co/lerobot/smolvla_base",
+      "prerequisites": [
+        "现场执行需要可用的机械臂、相机、校准和特定任务的示教。"
+      ]
+    },
+    "apple-foreground": {
+      "name": "Apple Vision 原生前景分离",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "masks"],
+      "strength": "自动找出图片前景并输出保留原尺寸的透明 PNG，随原生工具安装。",
+      "tradeoff": "每张图合并全部前景实例。按对象文字指令分离时选 SAM3。",
+      "license": {"name": "macOS 系统框架，适用 Apple 软件条款", "policy": "permissive"},
+      "platform": {"macos": 26, "arm64": true},
+      "source": "https://developer.apple.com/documentation/vision/vngenerateforegroundinstancemaskrequest",
+      "recipe": "docs/deployment.md#apple-foreground",
+      "install": [["bin/install", "core"], ["bin/register"]],
+      "mcp": {"tool": "extract_apple_foreground", "arguments": {}},
+      "local_cli": ["bin/local", "extract_apple_foreground"],
+      "markers": ["native/.build/release/apple-specialists"],
+      "evidence_note": "两猫样本找到两个实例，输出 640 × 480 RGBA，保留透明背景和非透明前景。"
+    },
+    "vision-media": {
+      "name": "Apple Vision 图像与视频分析",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "visual_media",
+        "local_cli"
+      ],
+      "strength": "对单张图或已抽取的视频帧做类别和外观评分，或比较两张图的特征距离。",
+      "tradeoff": "图像相似度阈值需按材料校准。抠图、光流和姿态走独立 API。",
+      "license": {
+        "name": "macOS 系统框架，适用 Apple 软件条款",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://developer.apple.com/documentation/vision",
+      "recipe": "docs/deployment.md#vision-media",
+      "install": [["bin/install", "core"], ["bin/register"]],
+      "mcp": {"tool": "inspect_apple_image", "arguments": {}},
+      "local_cli": ["bin/local", "inspect_apple_image"],
+      "markers": ["native/.build/release/apple-specialists"],
+      "evidence_note": "macOS 27.2.1 实测得到图像类别和外观分，同一图像距离 0，异图距离大于 0。"
+    },
+    "sound-analysis": {
+      "name": "Apple Sound Analysis",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "sound_events"
+      ],
+      "strength": "输出掌声、笑声或预设声音类的事件和区间。",
+      "tradeoff": "分类器词表与场景有关。人声活动、音源分离和文本识别各有独立工具。",
+      "license": {
+        "name": "macOS 系统框架，适用 Apple 软件条款",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://developer.apple.com/documentation/soundanalysis/classifying-sounds-in-an-audio-file",
+      "recipe": "docs/deployment.md#sound-analysis",
+      "install": [["bin/install", "core"], ["bin/register"]],
+      "mcp": {"tool": "classify_sound", "arguments": {}},
+      "local_cli": ["bin/local", "classify_sound"],
+      "markers": ["native/.build/release/apple-specialists"],
+      "evidence_note": "macOS 27.2.1 在合成语音上产出 6 个带置信度的 speech 时间窗。"
+    },
+    "shortcuts": {
+      "name": "macOS Shortcuts 文本与图像动作",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "local_cli",
+        "image_shortcut"
+      ],
+      "strength": "可用命令调用已配置的快捷指令。本机设备模型接收文字，图像 OCR 快捷指令也可接收显式提供的截图。",
+      "tradeoff": "动作组合与权限由快捷指令决定。",
+      "license": {
+        "name": "macOS 系统框架，适用 Apple 软件条款",
+        "policy": "permissive"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://support.apple.com/guide/shortcuts-mac/run-shortcuts-from-the-command-line-apd455c82f02/mac",
+      "recipe": "docs/deployment.md#shortcuts",
+      "install": [["bin/install", "core"], ["bin/register"]],
+      "mcp": {"tool": "run_apple_shortcut", "arguments": {}},
+      "local_cli": ["bin/local", "run_apple_shortcut"],
+      "probe": "shortcut",
+      "evidence_note": "手动文本与图像两条路线均已跑通。图像 OCR 在测试窗口的实拍文件中识别到 NATIVE-482。"
+    },
+    "screenshot-folder": {
+      "name": "macOS 目录事件 + Vision 截图 OCR",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "screenshot_automation", "boxes"],
+      "strength": "按指定目录的系统文件事件读取新截图，使用 Apple Vision 返回原文和位置。",
+      "tradeoff": "需要上游先捕获并发布完成的图像。CLI 可连续处理，MCP 单次等待一个文件。",
+      "license": {"name": "macOS 系统框架，适用 Apple 软件条款", "policy": "permissive"},
+      "platform": {"macos": 26, "arm64": true},
+      "source": "https://developer.apple.com/documentation/screencapturekit",
+      "recipe": "docs/deployment.md#screenshot-folder",
+      "install": [["bin/install", "core"], ["bin/register"]],
+      "local_cli": ["bin/local", "watch-screenshots"],
+      "mcp": {"tool": "wait_for_screenshot", "arguments": {}},
+      "markers": ["native/.build/release/apple-specialists"],
+      "evidence_note": "应用测试窗口的截图发布到指定目录后，两个客户端均通过新文件事件得到标记 NATIVE-482。"
+    },
+    "shortcuts-folder": {
+      "name": "macOS Shortcuts Folder 自动化",
+      "delivery": "local",
+      "evidence": "verified",
+      "features": ["screenshot_automation", "shortcuts_folder_trigger"],
+      "strength": "将新文件交给 Extract Text from Image，并在指定目录保存文本。",
+      "tradeoff": "需在 Shortcuts 中手动配置，首次触发可能延迟。Agent 可读取产物文件。",
+      "license": {"name": "macOS 系统框架，适用 Apple 软件条款", "policy": "permissive"},
+      "platform": {"macos": 27, "arm64": true},
+      "source": "https://support.apple.com/guide/shortcuts-mac/add-automations-apdfbdbd7123/mac",
+      "recipe": "docs/deployment.md#shortcuts-folder",
+      "probe": "shortcut_folder",
+      "evidence_note": "macOS 27.2.1 上两次 Folder 自动化运行均完成并保存 OCR，系统日志记录 WFFolderTrigger。"
+    },
+    "shortcuts-screenshot": {
+      "name": "macOS Shortcuts 系统 Screenshot 事件",
+      "delivery": "local",
+      "evidence": "verified",
+      "features": ["screenshot_automation", "shortcuts_system_trigger"],
+      "strength": "系统将窗口截图保存到文件时，Shortcuts 可直接触发工作流。",
+      "tradeoff": "Shortcuts 界面支持按目的地类型触发，需要手动配置。需要目录隔离及直接返回 OCR 时可选目录监视。",
+      "license": {"name": "macOS 系统框架，适用 Apple 软件条款", "policy": "permissive"},
+      "platform": {"macos": 27, "arm64": true},
+      "source": "https://support.apple.com/guide/shortcuts-mac/add-automations-apdfbdbd7123/mac",
+      "recipe": "docs/deployment.md#shortcuts-screenshot",
+      "probe": "shortcut_screenshot",
+      "evidence_note": "实体键盘截取合成窗口后，WFScreenshotTrigger 启动后台工作流并保存固定标记。项目的 Vision MCP 读回同一张截图的测试编号。"
+    },
+    "core-ml": {
+      "name": "Apple Core ML 第三方模型运行时",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": [
+        "core_ml",
+        "local_cli"
+      ],
+      "strength": "直接读取自备模型的输入输出结构，运行图像、标量、短字符串和小张量推理。",
+      "tradeoff": "实际算子调度和性能取决于模型与设备。序列、状态和自定义层需专门适配。",
+      "license": {
+        "name": "系统框架条款与选用模型许可分别核对",
+        "policy": "review"
+      },
+      "platform": {
+        "macos": 26,
+        "arm64": true
+      },
+      "source": "https://developer.apple.com/documentation/coreml",
+      "recipe": "docs/deployment.md#core-ml",
+      "install": [["bin/install", "core"], ["bin/register"]],
+      "mcp": {"tool": "predict_coreml", "arguments": {}},
+      "local_cli": ["bin/local", "predict_coreml"],
+      "markers": ["native/.build/release/apple-specialists"],
+      "evidence_note": "Core ML 编译并实跑自备的 ReLU 张量模型及 Apple 深度模型包。"
+    }
+  }
+}

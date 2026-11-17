@@ -1,0 +1,60 @@
+{
+  "artifacts": [
+    {
+      "repo": "LiquidAI/LFM3-1.7B-GGUF",
+      "revision": "cd0c74c575b5c416f3011b5b4c298077f26ca8c2",
+      "file": "LFM3-1.7B-BF16.gguf",
+      "size": 3466626336,
+      "sha256": "39158a79f56edb85e0c4252ce6447b8d7883ef82ffedd02f0cda7c84da5e9f68",
+      "path": "models/LFM3-1.7B-GGUF/LFM3-1.7B-BF16.gguf"
+    },
+    {
+      "repo": "LiquidAI/LFM3-1.7B-GGUF",
+      "revision": "cd0c74c575b5c416f3011b5b4c298077f26ca8c2",
+      "file": "LFM3-1.7B-Q4_K_M.gguf",
+      "size": 1099627808,
+      "sha256": "3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4",
+      "path": "models/LFM3-1.7B-GGUF/LFM3-1.7B-Q4_K_M.gguf"
+    },
+    {
+      "repo": "LiquidAI/LFM2.5-8B-A1B-GGUF",
+      "revision": "49c14831707011e64d70b2ebd8462ba08d608434",
+      "file": "LFM2.5-8B-A1B-Q8_0.gguf",
+      "size": 9010195680,
+      "sha256": "33ab3b8ce6a964fb8ebac89360c9b3cf72c4fa418d5e4c0a94d46883124d5c02",
+      "path": "models/LFM2.5-8B-A1B-GGUF/LFM2.5-8B-A1B-Q8_0.gguf"
+    },
+    {
+      "repo": "LiquidAI/LFM2.5-24B-A2B-GGUF",
+      "revision": "4a79de634b3ad965a5f49c8ae1ce3368112e6ad2",
+      "file": "LFM2.5-24B-A2B-Q8_0.gguf",
+      "size": 25493732640,
+      "sha256": "f09bf094a8a138c5b645598ca1abb6696a0fde26662d7af649b0713fdef330b6",
+      "path": "models/LFM2.5-24B-A2B-GGUF/LFM2.5-24B-A2B-Q8_0.gguf"
+    },
+    {
+      "repo": "LiquidAI/LFM2.5-24B-A2B-GGUF",
+      "revision": "4a79de634b3ad965a5f49c8ae1ce3368112e6ad2",
+      "file": "LFM2.5-24B-A2B-Q4_K_M.gguf",
+      "size": 14526258464,
+      "sha256": "d3334405b96228eb9908cdebb5c6194908f2da64282bda852afc3a3910c64e7d",
+      "path": "models/LFM2.5-24B-A2B-GGUF/LFM2.5-24B-A2B-Q4_K_M.gguf"
+    },
+    {
+      "repo": "LiquidAI/LFM3-VL-2B-GGUF",
+      "revision": "1add221a5ea6c047fcf1eaaf2d247939d7cf8849",
+      "file": "LFM3-VL-2B-BF16.gguf",
+      "size": 3466626336,
+      "sha256": "a7a514bd201faba4d329ec6d252253272904652576f0557ee84a106544d90298",
+      "path": "models/LFM3-VL-2B-GGUF/LFM3-VL-2B-BF16.gguf"
+    },
+    {
+      "repo": "LiquidAI/LFM3-VL-2B-GGUF",
+      "revision": "1add221a5ea6c047fcf1eaaf2d247939d7cf8849",
+      "file": "mmproj-LFM3-VL-2B-BF16.gguf",
+      "size": 378996032,
+      "sha256": "8e75a88afc0e6a3bcd637becbe720447ea0794934b7b417a1f42d5cfe0d9c288",
+      "path": "models/LFM3-VL-2B-GGUF/mmproj-LFM3-VL-2B-BF16.gguf"
+    }
+  ]
+}

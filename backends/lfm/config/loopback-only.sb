@@ -1,0 +1,6 @@
+(version 1)
+(allow default)
+(deny network-outbound)
+(allow network-outbound (remote ip "localhost:8080"))
+(allow network-outbound (remote unix-socket (path (param "SPECIALISTS_SOCKET"))))
+(allow network-outbound (remote unix-socket (path (param "OMNI_SOCKET"))))

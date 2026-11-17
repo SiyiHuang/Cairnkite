@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+root="$(cd "$(dirname "$0")/.." && pwd -P)"
+python="$root/.runtime/mcp/bin/python"
+if [[ ! -x "$python" ]]; then python="$(command -v python3)"; fi
+exec "$python" "$root/src/deployment.py" "$@"

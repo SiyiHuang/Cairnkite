@@ -1,0 +1,173 @@
+#!/bin/bash
+set -euo pipefail
+umask 077
+root="$(cd "$(dirname "$0")/.." && pwd -P)"
+cd "$root"
+
+if [[ "$(uname -s)-$(uname -m)" != Darwin-arm64 ]] || [[ "$(sw_vers -productVersion | cut -d. -f1)" -lt 26 ]]; then
+  echo "Requires macOS 26 or later on Apple Silicon." >&2
+  exit 1
+fi
+mkdir -p .runtime "$HOME/LocalSpecialists"
+
+sync_env() {
+  local profile="$1"
+  local options=()
+  if [[ "$profile" != "moss" ]]; then options+=(--require-hashes); fi
+  command -v uv >/dev/null
+  if [[ ! -x ".runtime/$profile/bin/python" ]]; then
+    uv venv --python 3.12 ".runtime/$profile"
+  fi
+  uv pip sync --python ".runtime/$profile/bin/python" ${options[@]+"${options[@]}"} "dependencies/$profile.lock"
+}
+fetch() {
+  HF_HUB_DISABLE_TELEMETRY=1 ".runtime/$2/bin/python" scripts/fetch_model.py "$1" ".runtime/models/$1"
+}
+build_native() (
+  local output="native/.build/release" sdk stage
+  sdk="$(xcrun --sdk macosx --show-sdk-path)"
+  mkdir -p "$output"
+  stage="$(mktemp -d "$output/.apple-specialists.XXXXXXXX")"
+  trap 'if [[ -f "$stage/apple-specialists" ]]; then unlink "$stage/apple-specialists"; fi; rmdir "$stage"' EXIT
+  xcrun --sdk macosx swiftc -sdk "$sdk" -target arm64-apple-macos26.0 -swift-version 6 -O \
+    native/Sources/apple-specialists/*.swift -o "$stage/apple-specialists"
+  mv -f "$stage/apple-specialists" "$output/apple-specialists"
+)
+core() {
+  sync_env mcp
+  build_native
+}
+paddle() {
+  sync_env paddle
+  sync_env mlx-vlm
+  fetch layout mlx-vlm
+  fetch paddle mlx-vlm
+}
+moss() {
+  sync_env moss
+  fetch moss moss
+}
+mlx_vlm_model() {
+  sync_env mlx-vlm
+  fetch "$1" mlx-vlm
+}
+qwen() {
+  sync_env qwen
+  fetch qwen-align qwen
+  if [[ "$1" == qwen ]]; then fetch qwen-asr qwen; fi
+  if [[ "$1" == qwen-large ]]; then fetch qwen-large qwen; fi
+}
+silero() (
+  command -v ffmpeg >/dev/null || { echo "Silero VAD requires ffmpeg on PATH." >&2; exit 1; }
+  sync_env silero
+  local model_dir=".runtime/models/silero-vad"
+  local revision="60b7ffa243625ebdc1070275a29f18c87843786a"
+  local filename="silero_vad_16k_sequence.onnx"
+  local digest="9ccdacc4719d8aa7e45a77536bfabec45a03ba1f2fad5e241ab4060b24238a85"
+  local temporary
+  mkdir -p "$model_dir"
+  if ! printf '%s  %s\n' "$digest" "$model_dir/$filename" | shasum -a 256 -c --status; then
+    temporary="$(mktemp -d "$model_dir/.download.XXXXXXXX")"
+    trap 'rm -f "$temporary/$filename"; rmdir "$temporary"' EXIT
+    curl -fsSL --retry 2 "https://raw.githubusercontent.com/snakers4/silero-vad/$revision/src/silero_vad/data/$filename" \
+      -o "$temporary/$filename"
+    printf '%s  %s\n' "$digest" "$temporary/$filename" | shasum -a 256 -c
+    mv -f "$temporary/$filename" "$model_dir/$filename"
+  fi
+  printf 'snakers4/silero-vad@%s\n' "$revision" > "$model_dir/.verified"
+)
+install_source_model() {
+  local profile="$1" package="$2" model="$3" source python
+  python=".runtime/$profile/bin/python"
+  command -v uv >/dev/null
+  if [[ ! -x "$python" ]]; then uv venv --python 3.12 ".runtime/$profile"; fi
+  uv pip install --require-hashes --no-deps --python "$python" -r "dependencies/$profile.lock"
+  source="$(awk -v package="$package" '$1 == package && $2 == "@" { print $3 }' "dependencies/$profile.in")"
+  uv pip install --no-deps --python "$python" "$package @ $source"
+  fetch "$model" "$profile"
+}
+omni() {
+  local app="$HOME/Applications/Omni.app"
+  local dmg=".runtime/Omni-0.20.5.dmg"
+  if [[ -e "$app" ]]; then
+    local version
+    version="$(plutil -extract CFBundleShortVersionString raw "$app/Contents/Info.plist")"
+    if [[ "$version" != "0.20.5" ]]; then
+      echo "Found Omni $version at $app. Version 0.20.5 is verified here." >&2
+      exit 1
+    fi
+    codesign --verify --deep --strict "$app"
+    echo "Omni is installed at $app."
+    python3 scripts/install_omni_model.py
+    return
+  fi
+  curl --fail --location --retry 2 \
+    "https://github.com/hanxiao/omni-macos/releases/download/v0.20.5/Omni-0.20.5.dmg" \
+    --output "$dmg"
+  printf '%s  %s\n' "47720032ec137a0dbcc2259f383711fb0bd44aa239e434ae7df113bd0b5ed4cd" "$dmg" | shasum -a 256 -c
+  local stage
+  stage="$(mktemp -d "$root/.runtime/omni-mount.XXXXXXXX")"
+  trap 'hdiutil detach "$stage" >/dev/null 2>&1 || true; rmdir "$stage" 2>/dev/null || true' EXIT
+  hdiutil attach -readonly -nobrowse -mountpoint "$stage" "$dmg" >/dev/null
+  codesign --verify --deep --strict "$stage/Omni.app"
+  spctl --assess --type execute --verbose "$stage/Omni.app"
+  mkdir -p "$HOME/Applications"
+  ditto "$stage/Omni.app" "$app"
+  hdiutil detach "$stage" >/dev/null
+  rmdir "$stage" 2>/dev/null || true
+  trap - EXIT
+  python3 scripts/install_omni_model.py
+}
+
+case "${1:-default}" in
+  default)
+    core
+    if [[ "$#" -gt 0 ]]; then shift; fi
+    for locale in "$@"; do native/.build/release/apple-specialists prepare-speech "$locale"; done
+    bin/lfm setup default
+    bin/lfm start --available
+    ;;
+  all) core; paddle; moss; omni ;;
+  core) core ;;
+  paddle) paddle ;;
+  moss) moss ;;
+  minicpm|jev|sam3|qwen-reranker|qwen-reranker-4bit) mlx_vlm_model "$1" ;;
+  jina-grep) mlx_vlm_model jina-code-05 ;;
+  clef) mlx_vlm_model clef-flash-4bit ;;
+  talknet) sync_env talknet; .runtime/talknet/bin/python scripts/install_talknet.py .runtime/models/talknet ;;
+  apple-fm-python) sync_env apple-fm-sdk; .runtime/apple-fm-sdk/bin/python scripts/install_apple_fm.py ;;
+  apple-spotlight) bash scripts/install_spotlight.sh ;;
+  lean) bash scripts/install_lean.sh ;;
+  lean-mathlib) bash scripts/install_lean.sh; bash scripts/install_lean_mathlib.sh ;;
+  goedel) bin/lfm setup --runtime-only; bash scripts/install_lean.sh; bash scripts/install_goedel.sh ;;
+  qwen|qwen-large|qwen-align) qwen "$1" ;;
+  silero) silero ;;
+  smolvla) sync_env smolvla; fetch smolvla smolvla; fetch smolvlm-config smolvla ;;
+  swiftvr) sync_env mlx-gen; fetch swiftvr mlx-gen ;;
+  seedvr2) sync_env mlx-gen; fetch seedvr2-3b-8bit mlx-gen ;;
+  hy-mt) install_source_model translation mlx-lm hy-mt ;;
+  gliner|chronos|timesfm) sync_env "$1"; fetch "$1" "$1" ;;
+  depth-anything) core; python3 scripts/install_depth_model.py ;;
+  privacy)
+    install_source_model privacy opf privacy
+    source scripts/privacy-tokenizer.sh
+    if ! privacy_tokenizer_ready; then
+      .runtime/privacy/bin/python -c 'import tiktoken; tiktoken.get_encoding("o200k_base")'
+    fi
+    privacy_tokenizer_ready || { echo 'The Privacy Filter tokenizer failed verification.' >&2; exit 1; }
+    ;;
+  omni) omni ;;
+  digup) bash scripts/install_digup.sh ;;
+  kokoro) sync_env kokoro; fetch kokoro kokoro ;;
+  sam-audio)
+    sync_env mlx-vlm
+    fetch sam-audio mlx-vlm
+    HF_HUB_DISABLE_TELEMETRY=1 .runtime/mlx-vlm/bin/python scripts/install_sam_audio_encoder.py .runtime/sam-audio-hf
+    ;;
+  speech) native/.build/release/apple-specialists prepare-speech "${2:-en-US}" ;;
+  lfm-fast|lfm-vision|lfm-tools|lfm-reason|lfm-fast-q4|lfm-reason-q4)
+    bin/lfm setup "$1"
+    bin/lfm start --available
+    ;;
+  *) echo "Usage: bin/install [default [speech-locale ...]|all|core|paddle|moss|omni|digup|jina-grep|clef|qwen-reranker|qwen-reranker-4bit|talknet|apple-fm-python|apple-spotlight|lean|lean-mathlib|goedel|kokoro|sam-audio|minicpm|jev|sam3|swiftvr|seedvr2|qwen|qwen-large|qwen-align|silero|smolvla|hy-mt|gliner|chronos|timesfm|depth-anything|privacy|speech [locale]|lfm-<model>]" >&2; exit 2 ;;
+esac

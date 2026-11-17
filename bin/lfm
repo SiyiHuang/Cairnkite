@@ -1,0 +1,18 @@
+#!/bin/bash
+set -euo pipefail
+umask 077
+root="$(cd "$(dirname "$0")/../backends/lfm" && pwd -P)"
+action="${1:-status}"
+if [[ "$#" -gt 0 ]]; then shift; fi
+
+case "$action" in
+  setup) exec python3 "$root/scripts/setup.py" "$@" ;;
+  start|stop|uninstall) exec python3 "$root/scripts/service.py" "$action" "$@" ;;
+  status) exec curl --noproxy '*' -fsS --max-time 3 http://127.0.0.1:8080/v1/models ;;
+  serve) exec "$root/.venv/bin/python" "$root/scripts/lfm_mcp.py" ;;
+  local) exec "$root/.venv/bin/python" "$root/scripts/lfm_mcp.py" --tool "$@" ;;
+  chat) exec "$root/.venv/bin/python" "$root/scripts/lfm_mcp.py" --model "$@" ;;
+  codex|claude) exec "$root/bin/$action-local" "$@" ;;
+  verify|verify_clients) exec "$root/.venv/bin/python" "$root/scripts/$action.py" "$@" ;;
+  *) echo 'Usage: bin/lfm [setup|start|stop|uninstall|status|serve|local|chat|codex|claude|verify|verify_clients]' >&2; exit 2 ;;
+esac

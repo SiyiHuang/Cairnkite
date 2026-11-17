@@ -1,0 +1,21 @@
+#!/bin/bash
+set -euo pipefail
+umask 077
+root="$(cd "$(dirname "$0")/.." && pwd -P)"
+opf="$root/.runtime/privacy/bin/opf"
+model="$root/.runtime/models/privacy"
+if [[ $# != 0 || -t 0 ]]; then
+  echo "Usage: bin/redact < input.txt > redacted.txt" >&2
+  exit 2
+fi
+if [[ ! -x "$opf" || ! -f "$model/.verified" ]]; then
+  echo "Run bin/install privacy first." >&2
+  exit 1
+fi
+source "$root/scripts/privacy-tokenizer.sh"
+if ! privacy_tokenizer_ready; then
+  echo "Run bin/install privacy to prepare the verified o200k_base tokenizer." >&2
+  exit 1
+fi
+export HF_HUB_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
+exec "$opf" redact --checkpoint "$model/original" --device cpu --format text -f /dev/stdin

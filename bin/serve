@@ -1,0 +1,5 @@
+#!/bin/bash
+set -euo pipefail
+umask 077
+root="$(cd "$(dirname "$0")/.." && pwd -P)"
+exec "$root/.runtime/mcp/bin/python" "$root/src/server.py" "$@"
