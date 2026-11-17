@@ -74,7 +74,7 @@ PDF 页码从 1 开始。图像使用第 1 页。文档边界框以左上角为�
 
    `uname -m` 应为 `arm64`，SDK 应为 26.4 或更新。尚未安装 `uv` 时，按官方说明安装并重新打开终端。 [uv 安装](https://docs.astral.sh/uv/getting-started/installation/)
 
-2. 克隆项目并进入目录。在固定位置保存仓库，客户端将从此路径启动 MCP。当前仓库为私有预发布，需要获准的 GitHub 账号访问。
+2. 克隆项目并进入目录。在固定位置保存仓库，客户端将从此路径启动 MCP。
 
    ```sh
    git clone https://github.com/SiyiHuang/cairnkite-release.git Cairnkite
