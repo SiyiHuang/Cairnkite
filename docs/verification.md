@@ -1,4 +1,31 @@
-# 本机验收记录
+# 验收记录
+
+## 默认方案的从零下载验收
+
+2026 年 11 月 17 日，在 Apple Silicon Mac、macOS 27.2.1、macOS SDK 27.2 上验证。客户端为 `codex-cli 0.169.0-alpha.11.1` 和 `2.1.126 (Claude Code)`。安装环境沿用这台 Mac 已就绪的 Speech 语言资源与 Apple Intelligence 设置。
+
+从新快照的空模型目录开始，经公网 HTTP Range 下载两个默认权重和视觉投影，共 7,312,248,704 字节。每段核对 HTTP 206、Content-Range 和长度，拼接后逐文件核对完整 SHA-256。随后由常规安装入口再次校验并部署这批文件。
+
+| 文件 | 字节数 | SHA-256 |
+| --- | --- | --- |
+| `LFM3-1.7B-BF16.gguf` | 3,466,626,336 | `39158a79f56edb85e0c4252ce6447b8d7883ef82ffedd02f0cda7c84da5e9f68` |
+| `LFM3-VL-2B-BF16.gguf` | 3,466,626,336 | `a7a514bd201faba4d329ec6d252253272904652576f0557ee84a106544d90298` |
+| `mmproj-LFM3-VL-2B-BF16.gguf` | 378,996,032 | `8e75a88afc0e6a3bcd637becbe720447ea0794934b7b417a1f42d5cfe0d9c288` |
+
+`bin/install default en-US zh-CN` 完成默认安装，后台服务使用新下载并校验过的权重重新启动。部署文件与下载文件的 SHA-256 一致。`bin/lfm verify --profile default` 通过字段抽取、缺失值、摘要、并发、长文本、图像问答和越界拒绝。
+
+两套客户端用空白配置注册了 `local_specialists` 和 `local-lfm`。随后在各自已登录的实际会话中，使用该快照的 MCP 启动命令验收以下工具。
+
+| 客户端 | 实际工具调用 | 结果 |
+| --- | --- | --- |
+| Codex | `status`、`plan_deployment`、`extract_fields`、`inspect_image` | 选到 `barcodes`，文本字段为 Dana、July 21、`room: null`，图片左侧实验台编号为 `ORBIT-741`。 |
+| Claude Code | 同上 | 同上。工具调用记录及终态均成功。 |
+
+原生 smoke 与 Apple 扩展 smoke 通过，覆盖 PDF 文字层、扫描 OCR、条码、分页证据、文件范围拒绝、语音转写、翻译、Foundation Models、Core ML 和原生媒体操作。选型与既有适配器、服务清单测试也通过。
+
+本轮实测平台为 macOS 27.2.1。其他支持版本上的资源可用性仍取决于系统、SDK、地区和语言设置。按[README](../README.md)运行本机验收，确认目标机器上的实际输出。
+
+## 扩展路线的既有验收
 
 2026 年 11 月 16 日，Apple Silicon Mac，macOS 27.2.1。常规 Codex 与 Claude Code 使用已登录的账号。离线 Codex 和离线 Claude Code 均用本机 LFM 作为主模型。专项测试加载同一个 stdio MCP。以下为指定样本的实测范围。
 

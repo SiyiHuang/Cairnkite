@@ -2,7 +2,7 @@
 .runtime/
 .state/
 logs/
-models/
+/models
 inbox/*
 !inbox/.gitkeep
 __pycache__/
