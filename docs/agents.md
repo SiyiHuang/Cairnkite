@@ -2,23 +2,41 @@
 
 [简体中文](agents.zh-CN.md)
 
-Before installation, ask Codex or Claude Code to read this guide and run `bin/plan <feature> --json`. A registered client can use `local_specialists.plan_deployment` with the same feature IDs.
+After cloning the repository, assign the following tasks to Codex or Claude Code. You can read the directory and run `bin/plan <feature> --json` directly before installation. If you are already registered for MCP, you can use `local_specialists.plan_deployment` instead, with the same parameters and logic.
 
-> Read docs/deployment.md and docs/agents.md. Use plan_deployment or bin/plan to recommend a tool for [expected output]. The target Mac is [macOS, chip, memory and available storage]. The intended use is [personal, commercial, production or research]. My hard requirements are [coordinates, word timing, speaker identity, glossary terms, local-only processing, or other constraints].
+> Read the docs/deployment.md and docs/agents.md in the repository, and call plan_deployment or bin/plan to view the decision tree. My task is to “fill in the expected output”, the device is “fill in macOS version, chip, memory, and available space”, the purpose is “personal, commercial, production, or research”, and the hard requirements are “fill in coordinates, word time, speaker, terminology, and other requirements such as keeping the material on this machine”.
 >
-> Report the best match and alternatives, evidence and setup requirements, and any exclusions. Give the corresponding recipe, install command, and one check using synthetic data. Ask about a missing requirement if the answer would change the recommendation.
+> Provide reasons for the preferred, alternative, and excluded options, indicating whether they have existing measurements, require configuration, or need upstream testing. List the deployment instructions relevant to my task, installation commands, and a step for checking the results using synthetic data. If any answer changes the choice, ask me about it first. During deployment, follow the installation scope I have specified.
 
-Use `profile=default` or `profile=optional` to narrow the selection. Read `recipe`, `evidence`, `readiness`, and `reasons`. The `mcp` and `local_cli` fields describe how to call each candidate. For LFM review, pass the recommended `model` in `mcp.arguments`.
+Also, use `profile=default` to prioritize checking the default installation, or specify `profile=optional` to check specific paths. For each candidate, `mcp` and `local_cli` provide actual calls. `mcp.server` distinguishes `local-lfm` from `local_specialists`. `status` contains `lfm_models`, which comes from the local loopback service and represents models that are visible to the service. Verification still uses examples from actual tasks.
 
-To plan for another Mac, pass a `target` such as `{"machine":"arm64","macos":"27.2","disk_gib":100,"memory_gib":24}`. The planner marks installed state on that target as `unknown_on_target`. For an existing index, pass the approved absolute `folder` and use the returned search arguments.
+When planning another machine, send `target` to `plan_deployment`, such as `{"machine":"arm64","macos":"27.2","disk_gib":100,"memory_gib":24}`. Explicit targets are marked with `unknown_on_target` to remind the Agent to review the actual installation and resources on that machine. When giving LFM the choice to review, also send `model` from the selected candidate `mcp.arguments` to the tool.
 
-## Examples
+When querying the data directory specified by the user on the local machine, pass the approved absolute path to `plan_deployment.folder`. Only when selecting a type and returning requires index preparation, refer to the index formula. Once ready, use the returned `mcp.arguments` along with the user’s query term to call `search`.
+
+## Two examples
+
+**“The time required to generate words from the proofed version. The recording and text are kept on this device.”**
 
 ```sh
 bin/plan align-transcript --execution local --require corrected_transcript --verified-only --json
+```
+
+The most suitable option is Qwen3-ForcedAligner. You need to provide the same recording, a revised version, and the language—up to 120 seconds per time slot. The execution phase is carried out directly on the local machine using `bin/local align_audio`.
+
+**Company information needs to be searchable by meaning, and must be suitable for commercial use.**
+
+```sh
 bin/plan semantic-search --use commercial --execution mcp --verified-only --json
 ```
 
-For local word timing from an edited transcript, use Qwen3-ForcedAligner with the matching audio, transcript, and language. Each call to `bin/local align_audio` accepts up to 120 seconds. For commercial semantic search, try DigUp. Run `bin/local index-digup <directory>`, then verify the pages or timestamps in the results. For code, build the index with `--code` and query with `code=true`. Omni's Jina weights have noncommercial terms.
+Choose DigUp. After installation, run `bin/local index-digup <directory>` on the authorized directory, then use `search` to query and verify page numbers or times. When checking codes, add `--code` to the index creation command, and pass `code=true` during querying. The Jina weight of Omni applies under non-commercial terms.
 
-Install the selected route, check its source and version, and run the recipe with synthetic data. Test an actual tool call in the chosen client before processing production material. For local-only tasks, use the terminal or an offline LFM-backed session. [Offline clients](deployment.md#offline-specialists)
+## From selection to deployment
+
+1. Read the returned `recipe`, and check `evidence`, `readiness`, and `reasons`. If there are no recommendations, keep the hard conditions that caused the exclusion.
+2. In relation to the goals and installation scope, describe the disk estimation, external apps, and required system resources. Check the index, pairing, microphone, or hardware according to the route. The upstream route is tested in a separate environment.
+3. After the user requests deployment, install the specified route step by step. Verify the source and version, and first use a synthetic sample to obtain the expected format and positioning information.
+4. For the MCP route, use `status` and a tool test to check client connections. For the CLI route, check the output on the local machine. Before processing the actual data, confirm the accessible paths and the scope of evidence that can be returned.
+
+`plan_deployment` Only returns selection information. The cloud agent may receive parameters and returned content from the inference tool. For materials that require to be kept entirely on the local machine, you can run `bin/local`, upstream local commands, or start a local LFM session using `bin/lfm codex --with-specialists` or `bin/lfm claude --with-specialists`. [Special tool](deployment.md#offline-specialists) called by offline client]

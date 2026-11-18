@@ -1,5 +1,6 @@
 """Validate decision paths independently of installed models or client accounts."""
 from contextlib import closing
+import json
 from pathlib import Path
 import re
 import sqlite3
@@ -20,6 +21,7 @@ MAC = {"machine": "arm64", "macos": "26.5", "disk_gib": 100, "memory_gib": 24}
 class PlannerTest(unittest.TestCase):
     def test_catalog_references_and_recipes(self):
         catalog = read_catalog()
+        self.assertNotRegex(json.dumps(catalog, ensure_ascii=False), r"[\u3400-\u9fff]")
         tree = plan()
         leaves = [leaf for group in tree["tasks"] for leaf in group["choices"]]
         self.assertEqual(len(leaves), len({leaf["id"] for leaf in leaves}))

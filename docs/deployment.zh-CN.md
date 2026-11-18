@@ -65,7 +65,7 @@ bin/register --check
 printf '%s\n' '{"text":"Marina inspected the prism.","fields":{"owner":"Name of the person who inspected it"}}' | bin/lfm local extract_fields
 ```
 
-核对 `owner` 为 `Marina`。缺失字段、中文改期和原文中带有指令分别用 `bin/lfm verify --profile default` 的合成样本验收。
+核对 `owner` 为 `Marina`。缺失字段、计划改期和原文中带有指令分别用 `bin/lfm verify --profile default` 的合成样本验收。
 
 <a id="lfm-vision"></a>
 ### LFM Vision 静态图像问答
