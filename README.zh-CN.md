@@ -79,7 +79,7 @@ PDF 页码从 1 开始。图像使用第 1 页。文档边界框以左上角为�
 2. 克隆项目并进入目录。在固定位置保存仓库，客户端将从此路径启动 MCP。
 
    ```sh
-   git clone https://github.com/SiyiHuang/cairnkite-release.git Cairnkite
+   git clone https://github.com/SiyiHuang/Cairnkite.git Cairnkite
    cd Cairnkite
    ```
 

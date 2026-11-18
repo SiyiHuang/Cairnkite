@@ -82,7 +82,7 @@ Requires Apple Silicon, macOS 26 or later, Xcode or Command Line Tools with the 
 2. Clone the project and enter the directory. Save the repository in a fixed location, and the client will start MCP from this path.
 
    ```sh
-   git clone https://github.com/SiyiHuang/cairnkite-release.git Cairnkite
+   git clone https://github.com/SiyiHuang/Cairnkite.git Cairnkite
    cd Cairnkite
    ```
 
