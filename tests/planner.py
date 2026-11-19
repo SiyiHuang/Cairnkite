@@ -81,6 +81,13 @@ class PlannerTest(unittest.TestCase):
         self.assertEqual(self.choose("visual-rerank", requirements=["compact_visual_reranker"],
                                      verified_only=True)["recommendation"], "qwen-reranker-4bit")
 
+    def test_whisper_route_is_optional(self):
+        result = self.choose("whisper-transcript", execution="mcp", verified_only=True)
+        self.assertEqual(result["recommendation"], "whisper")
+        self.assertEqual(result["candidates"][0]["mcp"],
+                         {"tool": "transcribe", "arguments": {"backend": "whisper"}})
+        self.assertIsNone(self.choose("whisper-transcript", profile="default")["recommendation"])
+
     def test_profiles(self):
         self.assertEqual(self.choose("scan", profile="default")["recommendation"], "vision")
         self.assertEqual(self.choose("scan", profile="optional")["recommendation"], "paddle")

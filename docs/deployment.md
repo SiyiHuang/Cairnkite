@@ -148,6 +148,23 @@ Install `core`. Use `document` ’s `backend="barcodes"` to read known QR codes 
 
 Run `bin/install speech en-US` or `bin/install speech zh-CN`. Use `status` to confirm the `speech_asset` of the required region code as `installed`. Use `transcribe` ’s `backend="apple"` to check the `copper prism`, segments, and time of the synthetic recording. It is also possible to approximate the speaking segment to locate the relevant sections. [SpeechTranscriber](https://developer.apple.com/documentation/speech/speechtranscriber)
 
+<a id="whisper"></a>
+### Offline transcription with Whisper
+
+Install FFmpeg and make it available on PATH. From the project root, run `bin/install core` if needed, then `bin/install whisper`. The installer builds whisper.cpp v1.9.5 with Metal and downloads the pinned Whisper large-v3-turbo Q8_0 and Silero VAD v6.2.0 weights, about 835 MiB in total. It verifies the source archive and both weights with SHA-256. If you already have both exact GGML files, run `bin/install whisper --reuse-from /path/to/models` to verify and copy them into Cairnkite.
+
+After `bin/register`, Codex and Claude Code can use `local_specialists.transcribe` with `backend="whisper"`. Provide an approved absolute audio `path`. Omit `language` for automatic detection or pass a Whisper code such as `en` or `zh`. The result contains text and segment timestamps in seconds. Each request accepts up to 30 minutes of audio. Split longer material into clips before calling the tool and add each clip's start offset when combining timestamps. For speaker labels, use MOSS. For word alignment against an edited transcript, use ForcedAligner.
+
+Run the smoke test to copy the synthetic meeting into the approved demo folder, then try the same JSON used by both MCP clients.
+
+```sh
+.runtime/mcp/bin/python tests/smoke.py
+printf '{"path":"%s","backend":"whisper","language":"en"}\n' "$HOME/LocalSpecialists/demo/meeting.wav" | bin/local transcribe
+bin/plan whisper-transcript --verified-only
+```
+
+Expect four segments containing `copper prism` and the telescope and spectrometer times. Check a pure-silence clip for an empty segment list. Decoding and inference run with network access denied. [whisper.cpp v1.9.5](https://github.com/ggml-org/whisper.cpp/releases/tag/v1.9.5) · [Pinned Whisper weights](https://huggingface.co/ggerganov/whisper.cpp/tree/5359861c739e955e79d9a303bcbc70fb988958b1) · [Pinned Silero VAD weights](https://huggingface.co/ggml-org/whisper-vad/tree/9ffd54a1e1ee413ddf265af9913beaf518d1639b)
+
 <a id="moss"></a>
 ### MOSS-Transcribe-Diarize
 

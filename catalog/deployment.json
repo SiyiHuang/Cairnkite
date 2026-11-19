@@ -86,7 +86,16 @@
             "apple-speech",
             "moss",
             "qwen-asr",
-            "qwen-large"
+            "qwen-large",
+            "whisper"
+          ]
+        },
+        {
+          "id": "whisper-transcript",
+          "label": "Offline Whisper transcription",
+          "prompt": "Need local transcription with automatic language detection and segment timestamps?",
+          "candidates": [
+            "whisper"
           ]
         },
         {
@@ -1229,6 +1238,24 @@
       ],
       "probe": "speech",
       "evidence_note": "The local file mode returns an empty observation, which is consistent with Apple’s description of the current API."
+    },
+    "whisper": {
+      "name": "whisper.cpp with Whisper large-v3-turbo Q8_0",
+      "delivery": "mcp",
+      "evidence": "verified",
+      "features": ["local_cli", "segment_timestamps"],
+      "strength": "Run a separate transcription model on Apple Silicon with automatic language detection, Silero VAD, and segment timestamps.",
+      "tradeoff": "Requires FFmpeg and about 835 MiB of model downloads. Each call handles up to 30 minutes and returns segment timing.",
+      "license": {"name": "MIT for whisper.cpp, Whisper, and Silero VAD", "policy": "permissive"},
+      "platform": {"macos": 26, "arm64": true},
+      "source": "https://github.com/ggml-org/whisper.cpp/releases/tag/v1.9.5",
+      "recipe": "docs/deployment.md#whisper",
+      "install": [["bin/install", "core"], ["bin/install", "whisper"], ["bin/register"]],
+      "mcp": {"tool": "transcribe", "arguments": {"backend": "whisper"}},
+      "local_cli": ["bin/local", "transcribe"],
+      "markers": [".runtime/whisper/whisper-cli", ".runtime/models/whisper/ggml-large-v3-turbo-q8_0.bin", ".runtime/models/whisper/ggml-silero-v6.2.0.bin"],
+      "probe": "whisper",
+      "evidence_note": "The synthetic meeting returned four timed segments. A silence fixture returned no segments."
     },
     "silero-vad": {
       "name": "Silero VAD 6.2.2 ONNX",

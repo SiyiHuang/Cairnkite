@@ -26,6 +26,7 @@ Registered clients can also call `local_specialists.plan_deployment`. [Deploymen
 | Second OCR route, review of difficult areas | `document` (`backend="minicpm"`), `score_ocr` | MiniCPM-OCR outputs the entire page text, and Jev provides consistency scores for the original cutout, candidates, and rendered images. |
 | Barcode and QR code | `document`, `backend="barcodes"` | Apple Vision returns the encoding value, type, and coordinates. |
 | General Recording Transcription | `transcribe`, `backend="apple"` | Apple Speech returns text and time intervals. Use `locale` to specify the installed language resources. |
+| Offline transcription with Whisper | `transcribe`, `backend="whisper"` | Whisper large-v3-turbo Q8_0 returns text and segment times with Silero VAD and automatic language detection. |
 | Only locate voice and mute | `transcribe`, `backend="silero"` | The small ONNX model returns speech segments on the CPU, without requiring language resources. |
 | Multiple people recording | `transcribe`, `backend="moss"` | MOSS MLX returns text, time interval, and anonymous speaker ID. |
 | Separate sound from the recording | `separate_audio` | SAM Audio returns the target and residual WAVs according to the description. |
@@ -152,6 +153,7 @@ LFM Vision should return the left bench code `ORBIT-741`. You can remove the sta
 ```sh
 bin/install paddle
 bin/install moss
+bin/install whisper
 bin/install qwen
 bin/install digup
 bin/install omni

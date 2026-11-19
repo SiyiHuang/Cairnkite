@@ -25,6 +25,7 @@ bin/plan semantic-search --use commercial --json
 | 第二路 OCR、疑难区域复核 | `document`（`backend="minicpm"`）、`score_ocr` | MiniCPM-OCR 输出整页文本，Jev 对原始裁图、候选和渲染图给出一致性分数。 |
 | 条码和二维码 | `document`，`backend="barcodes"` | Apple Vision 返回编码值、类型和坐标。 |
 | 通用录音转写 | `transcribe`，`backend="apple"` | Apple Speech 返回文字和时间区间。用 `locale` 指定已安装的语言资源。 |
+| Whisper 离线转写 | `transcribe`，`backend="whisper"` | Whisper large-v3-turbo Q8_0 返回文字和分段时间，支持 Silero VAD 和自动语言检测。 |
 | 只定位语音和静音 | `transcribe`，`backend="silero"` | 小型 ONNX 模型在 CPU 上返回语音区间，不需要语种资源。 |
 | 多人录音 | `transcribe`，`backend="moss"` | MOSS MLX 返回文字、时间区间和匿名说话人编号。 |
 | 从录音分离声音 | `separate_audio` | SAM Audio 按描述返回目标和残余 WAV。 |
@@ -148,6 +149,7 @@ cp tests/fixtures/observatory.png backends/lfm/inbox/observatory.png
 ```sh
 bin/install paddle
 bin/install moss
+bin/install whisper
 bin/install qwen
 bin/install digup
 bin/install omni

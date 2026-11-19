@@ -16,6 +16,7 @@
 | MiniCPM-OCR 1.0 8-bit | `4196fbbad59fd7a87647abf8cd36be25ad9c5c8f` | Apache 2.0。[MLX 权重](https://huggingface.co/nativ-community/MiniCPM-OCR-1.0-8bit/tree/4196fbbad59fd7a87647abf8cd36be25ad9c5c8f) · [OpenBMB 原模型](https://huggingface.co/openbmb/MiniCPM-OCR-1.0) |
 | MiniCPM-OCR Jev 8-bit | `fa1b463e56835d5d6b68253d8cd13f2f1cd54975` | Apache 2.0。[MLX 权重](https://huggingface.co/nativ-community/MiniCPM-OCR-Jev-8bit/tree/fa1b463e56835d5d6b68253d8cd13f2f1cd54975) · [OpenBMB 原模型](https://huggingface.co/openbmb/MiniCPM-OCR-Jev) |
 | mlx-qwen3-asr | 0.4.4 | [Apache 2.0 源码](https://github.com/moona3k/mlx-qwen3-asr) |
+| whisper.cpp 与 Whisper large-v3-turbo Q8_0 | v1.9.5 源码、固定 GGML 权重及 Silero VAD v6.2.0 | MIT。[whisper.cpp 发布](https://github.com/ggml-org/whisper.cpp/releases/tag/v1.9.5) · [Whisper 许可](https://github.com/openai/whisper#license) · [Silero VAD 许可](https://github.com/snakers4/silero-vad/blob/master/LICENSE) |
 | Silero VAD | v6.2.2 序列 ONNX，提交 `60b7ffa243625ebdc1070275a29f18c87843786a`，ONNX Runtime 1.32.0 | [MIT](https://github.com/snakers4/silero-vad/blob/v6.2.2/LICENSE) · [官方发布](https://github.com/snakers4/silero-vad/releases/tag/v6.2.2) |
 | Qwen3-ASR 0.6B 8-bit | `83ce2a8ef9a382d2ba2209aab383bc51fff366f5` | [Apache 2.0 模型卡](https://huggingface.co/moona3k/mlx-qwen3-asr-0.6b-8bit/tree/83ce2a8ef9a382d2ba2209aab383bc51fff366f5) |
 | Qwen3-ASR 1.7B 8-bit | `22c8abe6a6772122dda5905967d7496d1d3e8dd2` | [Apache 2.0 模型卡](https://huggingface.co/moona3k/mlx-qwen3-asr-1.7b-8bit/tree/22c8abe6a6772122dda5905967d7496d1d3e8dd2) |

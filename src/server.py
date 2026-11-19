@@ -29,6 +29,10 @@ from screenshot_watch import new_images
 
 ROOT = Path(__file__).resolve().parents[1]
 RUNTIME = ROOT / ".runtime"
+WHISPER_CLI = RUNTIME / "whisper/whisper-cli"
+WHISPER_MODELS = RUNTIME / "models/whisper"
+WHISPER_MODEL = WHISPER_MODELS / "ggml-large-v3-turbo-q8_0.bin"
+WHISPER_VAD = WHISPER_MODELS / "ggml-silero-v6.2.0.bin"
 WORKSPACE = Path(os.environ.get("LFM_SPECIALISTS_WORKSPACE", RUNTIME))
 ARTIFACTS = WORKSPACE / "artifacts"
 NATIVE = ROOT / "native/.build/release/apple-specialists"
@@ -280,6 +284,7 @@ def status(locale: Annotated[str, Field(min_length=2, max_length=24)] = "en-US")
         "qwen_alignment": installed("qwen") and has_model("qwen-align"),
         "qwen_asr": installed("qwen") and has_model("qwen-align") and has_model("qwen-asr"),
         "qwen_large": installed("qwen") and has_model("qwen-align") and has_model("qwen-large"),
+        "whisper": whisper_ready() and shutil.which("ffmpeg") is not None,
         "silero": installed("silero") and has_model("silero-vad") and shutil.which("ffmpeg") is not None,
         "smolvla": installed("smolvla") and has_model("smolvla") and has_model("smolvlm-config"),
         "hy_mt": installed("translation") and has_model("hy-mt"),
@@ -369,17 +374,67 @@ async def wait_for_screenshot(
     return await asyncio.to_thread(read_next_screenshot, root, wait_seconds, max_chars)
 
 
+def whisper_ready() -> bool:
+    return (WHISPER_CLI.is_file() and os.access(WHISPER_CLI, os.X_OK)
+            and WHISPER_MODEL.is_file() and WHISPER_VAD.is_file())
+
+
+def transcribe_whisper(path: Path, language: str | None) -> dict[str, Any]:
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg:
+        raise ToolError("Whisper requires ffmpeg on PATH.")
+    if not whisper_ready():
+        raise ToolError("Run bin/install whisper to install the pinned CLI and models.")
+    language = (language or "auto").lower()
+    if language != "auto" and not re.fullmatch(r"[a-z]{2,3}", language):
+        raise ToolError("Whisper language must be a Whisper language code such as en or zh, or auto.")
+    offline = ["/usr/bin/sandbox-exec", "-p", "(version 1) (allow default) (deny network*)"]
+    WORKSPACE.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="whisper-", dir=WORKSPACE) as directory:
+        work = Path(directory)
+        wav = work / "input.wav"
+        run_local([*offline, ffmpeg, "-v", "error", "-nostdin", "-protocol_whitelist", "file,pipe",
+                   "-format_whitelist", "wav,aiff,caf,mov,mp3,flac", "-i", str(path), "-map", "0:a:0",
+                   "-t", "1801", "-ar", "16000", "-ac", "1", "-c:a", "pcm_s16le", str(wav)],
+                  timeout=90, label="Whisper audio decoding")
+        with wave.open(str(wav), "rb") as audio:
+            duration = audio.getnframes() / audio.getframerate()
+        if not 0 < duration <= 1800:
+            raise ToolError("Whisper requires nonempty audio of at most 30 minutes.")
+        output = work / "result"
+        run_local([*offline, str(WHISPER_CLI), "-m", str(WHISPER_MODEL), "-l", language,
+                   "-mc", "0", "-bs", "3", "-bo", "2", "-t", "6", "-np", "-oj",
+                   "--vad", "-vm", str(WHISPER_VAD), "-vt", "0.28", "-vspd", "150",
+                   "-vsd", "350", "-vp", "220", "-vo", "0.16", "-f", str(wav), "-of", str(output)],
+                  timeout=285, label="Whisper transcription")
+        raw = json.loads(output.with_suffix(".json").read_text(encoding="utf-8"))
+    segments = []
+    for segment in raw["transcription"]:
+        offsets = segment["offsets"]
+        start = max(0, offsets["from"] / 1000)
+        end = min(duration, offsets["to"] / 1000)
+        text = segment["text"].strip()
+        if text and text != "[BLANK_AUDIO]" and start < end:
+            segments.append({"start_s": start, "end_s": end, "text": text})
+    return {"backend": "whisper_cpp", "source": str(path), "duration_s": duration,
+            "language": raw.get("result", {}).get("language") if segments else None,
+            "segment_unit": "segment", "segments": segments,
+            "text": " ".join(segment["text"] for segment in segments)}
+
+
 @mcp.tool(annotations=READ, structured_output=True)
 def transcribe(
-    path: str, backend: Literal["apple", "moss", "qwen", "qwen-large", "qwen-stream", "activity", "silero"] = "apple",
+    path: str, backend: Literal["apple", "moss", "qwen", "qwen-large", "qwen-stream", "activity", "silero", "whisper"] = "apple",
     locale: Annotated[str, Field(min_length=2, max_length=24)] = "en-US", max_chars: Budget = 5000,
     language: Annotated[str, Field(min_length=2, max_length=32)] | None = None,
 ) -> dict[str, Any]:
-    """Process an audio file. apple uses locale, moss labels speakers, and qwen or qwen-large add word times. qwen-stream replays chunks and returns partials. Choose silero for speech intervals without words. activity probes Apple SpeechDetector."""
+    """Process an audio file. apple uses locale, moss labels speakers, and qwen or qwen-large add word times. qwen-stream replays chunks and returns partials. Choose silero for speech intervals without words. activity probes Apple SpeechDetector. whisper adds segment timestamps and accepts a language code or auto."""
     file = scoped_path(path, suffixes=AUDIO_TYPES)
     start = monotonic()
     if backend == "apple":
         result = native(["transcribe", str(file), locale], timeout=285)
+    elif backend == "whisper":
+        result = transcribe_whisper(file, language)
     elif backend == "activity":
         result = native(["speech-activity", str(file), locale], timeout=285)
     elif backend == "silero":

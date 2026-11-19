@@ -142,6 +142,7 @@ case "${1:-default}" in
   goedel) bin/lfm setup --runtime-only; bash scripts/install_lean.sh; bash scripts/install_goedel.sh ;;
   qwen|qwen-large|qwen-align) qwen "$1" ;;
   silero) silero ;;
+  whisper) shift; uv run --no-project --python 3.12 python scripts/install_whisper.py "$@" ;;
   smolvla) sync_env smolvla; fetch smolvla smolvla; fetch smolvlm-config smolvla ;;
   swiftvr) sync_env mlx-gen; fetch swiftvr mlx-gen ;;
   seedvr2) sync_env mlx-gen; fetch seedvr2-3b-8bit mlx-gen ;;
@@ -169,5 +170,5 @@ case "${1:-default}" in
     bin/lfm setup "$1"
     bin/lfm start --available
     ;;
-  *) echo "Usage: bin/install [default [speech-locale ...]|all|core|paddle|moss|omni|digup|jina-grep|clef|qwen-reranker|qwen-reranker-4bit|talknet|apple-fm-python|apple-spotlight|lean|lean-mathlib|goedel|kokoro|sam-audio|minicpm|jev|sam3|swiftvr|seedvr2|qwen|qwen-large|qwen-align|silero|smolvla|hy-mt|gliner|chronos|timesfm|depth-anything|privacy|speech [locale]|lfm-<model>]" >&2; exit 2 ;;
+  *) echo "Usage: bin/install [default [speech-locale ...]|all|core|paddle|moss|omni|digup|jina-grep|clef|qwen-reranker|qwen-reranker-4bit|talknet|apple-fm-python|apple-spotlight|lean|lean-mathlib|goedel|kokoro|sam-audio|minicpm|jev|sam3|swiftvr|seedvr2|qwen|qwen-large|qwen-align|silero|whisper [--reuse-from DIR]|smolvla|hy-mt|gliner|chronos|timesfm|depth-anything|privacy|speech [locale]|lfm-<model>]" >&2; exit 2 ;;
 esac

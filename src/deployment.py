@@ -210,6 +210,9 @@ def readiness(entry: dict, *, translation_pair: tuple[str, str], locale: str,
         if folder is not None:
             return digup_index_ready(folder, code=feature == "code-search")
         return "needs_setup", "Build or refresh the intended folder's document or code index."
+    elif probe == "whisper":
+        if not shutil.which("ffmpeg"):
+            return "needs_setup", "Install FFmpeg and make it available on PATH."
     elif probe == "video_scale":
         support = native_probe(["video-scale-status"]).get("supported")
         if support is False:

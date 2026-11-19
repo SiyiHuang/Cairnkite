@@ -148,6 +148,23 @@ Codex 通过临时回环端口连接现有 LFM 服务。Lean 和 PaddleOCR 通�
 
 运行 `bin/install speech en-US` 或 `bin/install speech zh-CN`。用 `status` 确认所需地区码的 `speech_asset` 为 `installed`。用 `transcribe` 的 `backend="apple"` 检查合成录音的 `copper prism`、分段和时间。也可用识别段近似定位有人发言的区间。 [SpeechTranscriber](https://developer.apple.com/documentation/speech/speechtranscriber)
 
+<a id="whisper"></a>
+### Whisper 离线转写
+
+先安装 FFmpeg 并确保它在 PATH 上。如未安装核心工具，在仓库根目录运行 `bin/install core`，然后运行 `bin/install whisper`。安装器编译支持 Metal 的 whisper.cpp v1.9.5，并下载固定的 Whisper large-v3-turbo Q8_0 与 Silero VAD v6.2.0 权重，合计约 835 MiB。源码压缩包及两个权重均通过 SHA-256 校验。如果已有完全一致的两个 GGML 文件，可用 `bin/install whisper --reuse-from /path/to/models` 校验并复制到 Cairnkite。
+
+运行 `bin/register` 后，Codex 和 Claude Code 可通过 `local_specialists.transcribe` 使用 `backend="whisper"`。传入获准音频的绝对 `path`。省略 `language` 会自动识别，也可指定 `en` 或 `zh` 等 Whisper 语言代码。结果包含文字及以秒为单位的分段时间。单次最多处理 30 分钟。较长的录音可先切分，再按各片段的起始时间合并时间戳。说话人标签可用 MOSS，校订稿逐词对齐可用 ForcedAligner。
+
+先跑冒烟测试，将合成会议录音放入获准的 demo 目录。下面的 JSON 与两个 MCP 客户端使用的参数相同。
+
+```sh
+.runtime/mcp/bin/python tests/smoke.py
+printf '{"path":"%s","backend":"whisper","language":"en"}\n' "$HOME/LocalSpecialists/demo/meeting.wav" | bin/local transcribe
+bin/plan whisper-transcript --verified-only
+```
+
+预期返回四段，包含 `copper prism` 及望远镜和光谱仪时间。纯静音应返回空分段。音频解码和推理均在禁网状态下运行。 [whisper.cpp v1.9.5](https://github.com/ggml-org/whisper.cpp/releases/tag/v1.9.5) · [固定 Whisper 权重](https://huggingface.co/ggerganov/whisper.cpp/tree/5359861c739e955e79d9a303bcbc70fb988958b1) · [固定 Silero VAD 权重](https://huggingface.co/ggml-org/whisper-vad/tree/9ffd54a1e1ee413ddf265af9913beaf518d1639b)
+
 <a id="moss"></a>
 ### MOSS-Transcribe-Diarize
 
